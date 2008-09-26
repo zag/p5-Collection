@@ -59,6 +59,16 @@ sub _define_accessor {
     $code;
 }
 
+sub _deprecated {
+    my $self       = shift;
+    my $new_method = shift;
+    my ( $old_method, $called_from_str, $called_from_method ) =
+      ( ( caller(1) )[3], ( caller(1) )[2], ( caller(2) )[3] );
+    print STDERR 
+"called deprecated method $old_method from $called_from_method at line $called_from_str. Use method $new_method instead."
+    ;
+}
+
 sub new {
     my $class = shift;
     my $self  = {};

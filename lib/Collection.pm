@@ -99,7 +99,7 @@ or array of refs to HASHes
     {  id=>ID1 }, {id => ID2 }, ...
  
 
-Format of parametrs depend method L<delete_objects>
+Format of parametrs depend method L<delete>
 
 =cut
 
@@ -131,10 +131,10 @@ sub create {
     my $self     = shift;
     my $coll_ref = $self->_obj_cache();
     my $results  = $self->_create(@_);
-    return $self->fetch_objects( keys %$results );
+    return $self->fetch( keys %$results );
 }
 
-=head2 fetch_object(ID1)
+=head2 fetch_one(ID1)
 
 Public method. Fetch object from collection for given ID.
 Return ref to objects or undef unless exists.
@@ -142,15 +142,19 @@ Return ref to objects or undef unless exists.
 =cut
 
 sub fetch_object {
+    die $_[0]->_deprecated('fetch_one');
+}
+
+sub fetch_one {
     my ( $self, $id ) = @_;
     my $res;
-    if ( my $item_refs = $self->fetch_objects($id) ) {
+    if ( my $item_refs = $self->fetch($id) ) {
         $res = $item_refs->{$id};
     }
     return $res;
 }
 
-=head2 fetch_objects(ID1 [, ID2, ...])
+=head2 fetch(ID1 [, ID2, ...])
 
 Public method. Fetch objects from collection for given IDs.
 Return ref to HASH, where where keys is IDs, values is objects refs.
@@ -162,6 +166,10 @@ Parametrs:
 =cut
 
 sub fetch_objects {
+    die $_[0]->_deprecated('fetch');
+}
+
+sub fetch {
     my $self = shift;
     my (@ids) =
       map { ref($_) ? $_ : { id => $_ } } grep { defined $_ } @_;
@@ -189,13 +197,17 @@ sub fetch_objects {
     };
 }
 
-=head2 release_objects(ID1[, ID2, ...])
+=head2 release(ID1[, ID2, ...])
 
-Release from collection objects with IDs.
+Release from collection objects with IDs. Only delete given keys from collection or all if empty
 
 =cut
 
 sub release_objects {
+    die $_[0]->_deprecated('release');
+}
+
+sub release {
     my $self = shift;
     my (@ids) = map { ref($_) ? $_ : { id => $_ } } @_;
     my $coll_ref = $self->_obj_cache();
@@ -216,20 +228,25 @@ sub release_objects {
     }    #else
 }
 
-=head2 store_changed([ID1,[ID2,...]]) 
+=head2 store([ID1,[ID2,...]]) 
 
 Call _store for changed objects.
 Store all  all loaded objects without parameters:
 
-    $simple_collection->store_changed(); #store all changed
+    $simple_collection->store(); #store all changed
 
 or (for 1,2,6 IDs )
 
-    $simple_collection->store_changed(1,2,6);
+    $simple_collection->store(1,2,6);
 
 =cut
 
 sub store_changed {
+    die $_[0]->_deprecated('store');
+
+}
+
+sub store {
     my $self      = shift;
     my @store_ids = @_;
     my $coll_ref  = $self->_obj_cache();
@@ -247,24 +264,28 @@ sub store_changed {
     }
 }
 
-=head2 delete_objects(ID1[,ID2, ...])
+=head2 delete(ID1[,ID2, ...])
 
 Release from collections and delete from storage (by calling L<_delete>)
 objects ID1,ID2...
 
-    $simple_collection->delete_objects(1,5,84);
+    $simple_collection->delete(1,5,84);
 
 
 =cut
 
 sub delete_objects {
+    die $_[0]->_deprecated('delete');
+}
+
+sub delete {
     my $self = shift;
     my (@ids) = map { ref($_) ? $_ : { id => $_ } } @_;
-    $self->release_objects(@ids);
+    $self->release(@ids);
     $self->_delete(@ids);
 }
 
-=head2 get_lazy_object(ID1)
+=head2 get_lazy(ID1)
 
 Method for base support lazy load objects from data storage.
 Not really return lazy object.
@@ -272,9 +293,13 @@ Not really return lazy object.
 =cut
 
 sub get_lazy_object {
+    die $_[0]->_deprecated('get_lazy');
+
+}
+
+sub get_lazy {
     my ( $self, $id ) = @_;
-    return new Collection::LazyObject::
-      sub { $self->fetch_object($id) };
+    return new Collection::Utl::LazyObject:: sub { $self->fetch_one($id) };
 }
 
 =head2
@@ -298,7 +323,7 @@ sub get_changed_id {
             push @changed, $id if $value->_changed();
         }
     }
-    return \@changed
+    return \@changed;
 }
 
 sub list_ids {
@@ -319,7 +344,7 @@ Zahatski Aliaksandr, <zag@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2007 by Zahatski Aliaksandr
+Copyright (C) 2005-2008 by Zahatski Aliaksandr
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

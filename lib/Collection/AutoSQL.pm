@@ -1,13 +1,13 @@
-package Objects::Collection::AutoSQL;
+package Collection::AutoSQL;
 
 =head1 NAME
 
- Objects::Collection::AutoSQL - class for collections of data, stored in database.
+ Collection::AutoSQL - class for collections of data, stored in database.
 
 =head1 SYNOPSIS
 
-  use Objects::Collection::AutoSQL;
-  my $metaobj = new Objects::Collection::AutoSQL::
+  use Collection::AutoSQL;
+  my $metaobj = new Collection::AutoSQL::
            dbh => $dbh,         #database connect
            table => 'metadata', #table name
            field=> 'mid',       #key field (IDs), usually primary,autoincrement
@@ -38,14 +38,14 @@ For exampe:
  +-----+--------+-----------+
  5 rows in set (0.00 sec)
 
- my $beers = new Objects::Collection::AutoSQL::
+ my $beers = new Collection::AutoSQL::
   dbh     => $dbh,          #database connect
   table   => 'beers',       #table name
   field   => 'bid',         #key field (IDs), usually primary,autoincrement
   cut_key => 1;             #delete field 'bid' from readed records,
 
 
- my $heineken = $beers->fetch_object(1);
+ my $heineken = $beers->fetch_one(1);
  #SELECT * FROM beers WHERE bid in (1)
 
  print Dumper($heineken);
@@ -60,16 +60,16 @@ For exampe:
  
  $heineken->{bcount}++;
 
- my $karhu = $beers->fetch_object(5);
+ my $karhu = $beers->fetch(5);
  #SELECT * FROM beers WHERE bid in (5)
  
  $karhu->{bcount}++;
  
- $beers->store_changed;
+ $beers->store;
  #UPDATE beers SET bcount='2',bname='heineken' where bid=1
  #UPDATE beers SET bcount='4',bname='karhu' where bid=5
 
- my $hash = $beers->fetch_objects({bcount=>[4,1]});
+ my $hash = $beers->fetch_one({bcount=>[4,1]});
  #SELECT * FROM beers WHERE  ( bcount in (4,1) )
  
  print Dumper($hash);
@@ -99,11 +99,11 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Carp;
-use Objects::Collection;
-use Objects::Collection::Base;
-use Objects::Collection::ActiveRecord;
-@Objects::Collection::AutoSQL::ISA     = qw(Objects::Collection);
-$Objects::Collection::AutoSQL::VERSION = '0.02';
+use Collection;
+use Collection::Base;
+use Collection::ActiveRecord;
+@Collection::AutoSQL::ISA     = qw(Collection);
+$Collection::AutoSQL::VERSION = '0.02';
 attributes qw( _dbh _table_name _key_field _is_delete_key_field _sub_ref);
 
 sub _init {
@@ -273,7 +273,7 @@ sub _create {
              $self->_dbh->last_insert_id( '', '', $table_name, $field )
           || $self->GetLastID();
     }
-    return { $inserted_id => $self->fetch_object($inserted_id) };
+    return { $inserted_id => $self->fetch_one($inserted_id) };
 }
 
 sub _delete {
@@ -300,7 +300,7 @@ sub _fetch_ids {
 sub _prepare_record {
     my ( $self, $key, $ref ) = @_;
     my %hash;
-    tie %hash, 'Objects::Collection::ActiveRecord', hash => $ref;
+    tie %hash, 'Collection::ActiveRecord', hash => $ref;
     if ( ref( $self->_sub_ref ) eq 'CODE' ) {
         return $self->_sub_ref()->( $key, \%hash );
     }
@@ -308,9 +308,9 @@ sub _prepare_record {
 }
 
 # overlap for support get by query
-sub fetch_object {
+sub fetch_one {
     my $self = shift;
-    my ($obj) = values %{ $self->fetch_objects(@_) };
+    my ($obj) = values %{ $self->fetch(@_) };
     $obj;
 }
 
@@ -330,7 +330,7 @@ __END__
 
 =head1 SEE ALSO
 
-Objects::Collection::ActiveRecord, Objects::Collection, README
+Collection::ActiveRecord, Collection, README
 
 =head1 AUTHOR
 

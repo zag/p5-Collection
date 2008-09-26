@@ -27,25 +27,25 @@ my $beers = new Collection::AutoSQL::
  $beers->create(bcount=>2,bname=>'castel');
  $beers->create(bcount=>3,bname=>'karhu');
  ok($created_rec,"create record");
- $beers->release_objects;
+ $beers->release;
 =pod
- my $hash1 = $beers->fetch_objects({bcount=>2});
+ my $hash1 = $beers->fetch({bcount=>2});
  print Dumper($hash1);
 
- my $hash2 = $beers->fetch_objects({bcount=>[3,2]});
+ my $hash2 = $beers->fetch({bcount=>[3,2]});
  print Dumper($hash2);
 =cut
 
- my $heineken = $beers->fetch_object(1);
+ my $heineken = $beers->fetch_one(1);
  print Dumper($heineken);
  $heineken->{bcount}++;
 
- my $karhu = $beers->fetch_object(5);
+ my $karhu = $beers->fetch_one(5);
  $karhu->{bcount}++;
  
- $beers->store_changed;
+ $beers->store;
 
- my $hash1 = $beers->fetch_objects({bcount=>[4,1]});
+ my $hash1 = $beers->fetch({bcount=>[4,1]});
  print Dumper($hash1);
 
 $dbh->disconnect;

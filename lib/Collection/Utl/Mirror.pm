@@ -62,7 +62,7 @@ sub _fetch {
     my ( $c1, $c2 ) = @{ $self->_stack };
 
     #read keys from first collection
-    my $res1     = $c1->fetch_objects(@_);
+    my $res1     = $c1->fetch(@_);
     my @notfound = ();
     foreach my $key (@ids) {
         push @notfound, $key unless exists $res1->{$key};
@@ -72,7 +72,7 @@ sub _fetch {
         #if we not found some keys, then fetch from coll2
         #and store to coll1
         #        diag "Fetch non exists in col1".Dumper (\@notfound);
-        my $res2        = $c2->fetch_objects(@notfound);
+        my $res2        = $c2->fetch(@notfound);
         my %create_keys = ();
         foreach my $k1 (@notfound) {
             next unless exists $res2->{$k1};    #skip real nonexists keys
@@ -119,7 +119,7 @@ sub _store {
     my ( $c1, $c2 ) = @{ $self->_stack };
     my $hash2store = shift;
     my @ids2store  = keys %$hash2store;
-    my $coll2res   = $c2->fetch_objects(@ids2store);
+    my $coll2res   = $c2->fetch(@ids2store);
 
     #and create new in col2
     #create non exists keys on c2
@@ -150,8 +150,8 @@ sub _store {
 
     }
     # changed items we also mirror to coll2
-    $c1->store_changed(@ids2store);
-    $c2->store_changed(@ids2store);
+    $c1->store(@ids2store);
+    $c2->store(@ids2store);
     return;
 }
 
@@ -173,7 +173,7 @@ sub _delete {
     my $self = shift;
     my ( $c1, $c2 ) = @{ $self->_stack };
     for ( $c1, $c2 ) {
-        $_->delete_objects(@_)
+        $_->delete(@_)
     }
 }
 1;
