@@ -1,17 +1,17 @@
-package Objects::Collection::ActiveRecord;
+package Collection::Utl::ActiveRecord;
 
 =head1 NAME
 
- Objects::Collection::ActiveRecord -  Tools for track changes in HASHes.
+ Collection::Utl::ActiveRecord -  Tools for track changes in HASHes.
 
 =head1 SYNOPSIS
 
- use Objects::Collection::ActiveRecord;
+ use Collection::Utl::ActiveRecord;
 
  sub _prepare_record {
     my ( $self, $key, $ref ) = @_;
     my %hash;
-    tie %hash, 'Objects::Collection::ActiveRecord', hash => $ref;
+    tie %hash, 'Collection::Utl::ActiveRecord', hash => $ref;
     return \%hash;
  }
 
@@ -27,9 +27,9 @@ use strict;
 use Carp;
 use Data::Dumper;
 require Tie::Hash;
-use Objects::Collection::Base;
-@Objects::Collection::ActiveRecord::ISA = qw(Tie::StdHash Objects::Collection::Base);
-$Objects::Collection::ActiveRecord::VERSION = '0.01';
+use Collection::Base;
+@Collection::Utl::ActiveRecord::ISA = qw(Tie::StdHash Collection::Base);
+$Collection::Utl::ActiveRecord::VERSION = '0.01';
 
 attributes qw( _changed _orig_record __temp_array);
 
@@ -79,7 +79,7 @@ sub GetKeys {
 }
 
 
-sub TIEHASH {return Objects::Collection::Base::new(@_) }
+sub TIEHASH {return Collection::Base::new(@_) }
 
 sub FIRSTKEY {
     my ($self) = @_;
