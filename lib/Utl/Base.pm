@@ -1,6 +1,6 @@
 package Objects::Collection::Base;
 
-#$Id: Base.pm,v 1.3 2006/04/27 14:56:19 zag Exp $
+#$Id$
 
 =head1 NAME
 
