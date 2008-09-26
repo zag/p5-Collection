@@ -1,15 +1,15 @@
 #!/usr/bin/perl
-use Objects::Collection::AutoSQL;
+use Collection::AutoSQL;
 use Data::Dumper;
 use DBI;
 use Test::More qw(no_plan);
 use strict;
 my $DSN = "mysql:database=orders;host=localhost;";
 my $dbh =
-  DBI->connect( "DBI:$DSN", 'root', 'zreboot36',
+  DBI->connect( "DBI:$DSN", 'root', '****',
     { RaiseError => 0, PrintError => 1, AutoCommit => 0 } )
   or die $DBI::errstr;
-my $beers = new Objects::Collection::AutoSQL::
+my $beers = new Collection::AutoSQL::
   dbh     => $dbh,          #database connect
   table   => 'beers',    #table name
   field   => 'bid',         #key field (IDs), usually primary,autoincrement
