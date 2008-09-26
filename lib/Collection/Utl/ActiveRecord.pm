@@ -27,8 +27,8 @@ use strict;
 use Carp;
 use Data::Dumper;
 require Tie::Hash;
-use Collection::Base;
-@Collection::Utl::ActiveRecord::ISA = qw(Tie::StdHash Collection::Base);
+use Collection::Utl::Base;
+@Collection::Utl::ActiveRecord::ISA = qw(Tie::StdHash Collection::Utl::Base);
 $Collection::Utl::ActiveRecord::VERSION = '0.01';
 
 attributes qw( _changed _orig_record __temp_array);
@@ -79,7 +79,7 @@ sub GetKeys {
 }
 
 
-sub TIEHASH {return Collection::Base::new(@_) }
+sub TIEHASH {return Collection::Utl::Base::new(@_) }
 
 sub FIRSTKEY {
     my ($self) = @_;

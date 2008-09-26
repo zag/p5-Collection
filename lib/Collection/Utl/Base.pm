@@ -1,15 +1,15 @@
-package Objects::Collection::Base;
+package Collection::Utl::Base;
 
 #$Id$
 
 =head1 NAME
 
- Objects::Collection::Base - abstract class.
+ Collection::Utl::Base - abstract class.
 
 =head1 SYNOPSIS
 
-    use Objects::Collection::Base;
-    @Objects::Collection::ISA = qw(Objects::Collection::Base);
+    use Collection::Utl::Base;
+    @Collection::ISA = qw(Collection::Utl::Base);
 
 =head1 DESCRIPTION
 
@@ -26,9 +26,9 @@ use strict;
 use Carp;
 use Data::Dumper;
 require Exporter;
-@Objects::Collection::Base::ISA    = qw(Exporter);
-@Objects::Collection::Base::EXPORT = qw(attributes);
-$Objects::Collection::Base::VERSION = '0.01';
+@Collection::Utl::Base::ISA    = qw(Exporter);
+@Collection::Utl::Base::EXPORT = qw(attributes);
+$Collection::Utl::Base::VERSION = '0.01';
 
 sub attributes {
     my ($pkg) = caller;
@@ -81,7 +81,7 @@ __END__
 
 =head1 SEE ALSO
 
-Objects::Collection, README
+Collection, README
 
 =head1 AUTHOR
 
@@ -89,7 +89,7 @@ Zahatski Aliaksandr, <zag@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2006 by Zahatski Aliaksandr
+Copyright (C) 2005-2008 by Zahatski Aliaksandr
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
