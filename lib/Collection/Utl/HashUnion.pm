@@ -1,14 +1,14 @@
-package Objects::Collection::HashUnion;
+package Collection::Utl::HashUnion;
 
 =head1 NAME
 
- Objects::Collection::HashUnion -  Union hashes.
+ Collection::Utl::HashUnion -  Union hashes.
 
 =head1 SYNOPSIS
 
-    use Objects::Collection::HashUnion;
+    use Collection::Utl::HashUnion;
 
-   tie %hashu, 'Objects::Collection::HashUnion', \%hash1, \%hash2;
+   tie %hashu, 'Collection::Utl::HashUnion', \%hash1, \%hash2;
 
 =head1 DESCRIPTION
 
@@ -22,9 +22,9 @@ use strict;
 use Carp;
 use Data::Dumper;
 require Tie::Hash;
-use Objects::Collection::Base;
-@Objects::Collection::HashUnion::ISA = qw(Tie::StdHash Objects::Collection::Base);
-$Objects::Collection::HashUnion::VERSION = '0.01';
+use Collection::Utl::Base;
+@Collection::Utl::HashUnion::ISA = qw(Tie::StdHash Collection::Utl::Base);
+$Collection::Utl::HashUnion::VERSION = '0.01';
 
 attributes qw( _orig_hashes _for_write __temp_array);
 
@@ -106,7 +106,7 @@ sub GetKeys {
 }
 
 
-sub TIEHASH {return Objects::Collection::Base::new(@_) }
+sub TIEHASH {return Collection::Utl::Base::new(@_) }
 
 sub FIRSTKEY {
     my ($self) = @_;
@@ -148,7 +148,7 @@ Zahatski Aliaksandr, <zag@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2006 by Zahatski Aliaksandr
+Copyright (C) 2005-2008 by Zahatski Aliaksandr
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

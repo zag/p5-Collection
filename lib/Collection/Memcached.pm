@@ -1,12 +1,12 @@
-package Objects::Collection::Memcached;
+package Collection::Memcached;
 
 =head1 NAME
 
-Objects::Collection::Memcached - class for collections of data, stored in Memcached.
+Collection::Memcached - class for collections of data, stored in Memcached.
 
 =head1 SYNOPSIS
 
-    use Objects::Collection::Memcached;
+    use Collection::Memcached;
     use Cache::Memcached;
     $memd = new Cache::Memcached {
     'servers' => [ "127.0.0.1:11211" ],
@@ -15,9 +15,9 @@ Objects::Collection::Memcached - class for collections of data, stored in Memcac
   };
   $memd->set_compress_threshold(10_000);
   $memd->enable_compress(0);
-  my $collection = new Objects::Collection::Memcached:: $memd;
+  my $collection = new Collection::Memcached:: $memd;
   ...
-  my $collection_prefix = new Objects::Collection::Memcached:: $memd, 'prefix';
+  my $collection_prefix = new Collection::Memcached:: $memd, 'prefix';
 
 
 =head1 DESCRIPTION
@@ -28,22 +28,22 @@ Class for collections of data, stored in Memcached.
 
 =head2 new <memcached object>[, <prefix>]
 
-Creates a new Objects::Collection::Memcached object. Keys transparently autoprefixed with <prefix> if provided.
+Creates a new Collection::Memcached object. Keys transparently autoprefixed with <prefix> if provided.
 
-      my $collection_prefix = new Objects::Collection::Memcached:: $memd, 'prefix';
+      my $collection_prefix = new Collection::Memcached:: $memd, 'prefix';
 
 
 =cut
 
-use Objects::Collection;
-use Objects::Collection::Base;
+use Collection;
+use Collection::Utl::Base;
 use Data::Dumper;
-use Objects::Collection::ActiveRecord;
+use Collection::Utl::ActiveRecord;
 
 use strict;
 use warnings;
 
-our @ISA     = qw(Objects::Collection);
+our @ISA     = qw(Collection);
 our $VERSION = '0.01';
 
 attributes qw/ _mem_cache _ns /;
@@ -114,7 +114,7 @@ sub _fetch {
 sub _prepare_record {
     my ( $self, $key, $ref ) = @_;
     my %hash;
-    tie %hash, 'Objects::Collection::ActiveRecord', hash => $ref;
+    tie %hash, 'Collection::Utl::ActiveRecord', hash => $ref;
     return \%hash;
 }
 
@@ -143,7 +143,7 @@ __END__
 
 =head1 SEE ALSO
 
-Objects::Collection, README
+Collection, README
 
 =head1 AUTHOR
 

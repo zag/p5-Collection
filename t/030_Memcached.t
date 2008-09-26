@@ -33,14 +33,14 @@ else {
     plan tests => 25;
 }
 
-use_ok('Objects::Collection');
-use_ok('Objects::Collection::Memcached');
+use_ok('Collection');
+use_ok('Collection::Memcached');
 
 $memd->set_compress_threshold(10_000);
 $memd->enable_compress(0);
 $memd->set_debug;
-ok !( new Objects::Collection::Memcached:: ), 'empty params';
-ok my $coll = ( new Objects::Collection::Memcached:: $memd), 'create';
+ok !( new Collection::Memcached:: ), 'empty params';
+ok my $coll = ( new Collection::Memcached:: $memd), 'create';
 ok !$coll->fetch_object(1), 'get non_exists';
 is_deeply(
     $coll->create( 1 => { 2 => 2 } ),
@@ -60,7 +60,7 @@ is_deeply(
     'check create'
 );
 ok my $t3 = $coll->fetch_object(3), 'get key 3';
-isa_ok tied %$t3, 'Objects::Collection::ActiveRecord', 'check is ActiveRecord';
+isa_ok tied %$t3, 'Collection::Utl::ActiveRecord', 'check is ActiveRecord';
 $t3->{5} = 5;
 ok( ( tied %$t3 )->_changed(), 'check changed' );
 $coll->store_changed;
@@ -76,7 +76,7 @@ is_deeply $t3_,
   'check store_changed';
 is_deeply $coll->list_ids, [3], 'check list_ids';
 my $ns = 'ns1';
-ok my $collns = ( new Objects::Collection::Memcached:: $memd, $ns ),
+ok my $collns = ( new Collection::Memcached:: $memd, $ns ),
   "create with prefix $ns";
 is_deeply $collns->list_ids, [], 'cache after init';
 is $collns->_ns, $ns, 'check prefix attribute';
@@ -96,7 +96,7 @@ is_deeply $collns->fetch_object(3),
     '7' => 7
   },
   'changed key 3';
-ok my $collns2 = ( new Objects::Collection::Memcached:: $memd, $ns ),
+ok my $collns2 = ( new Collection::Memcached:: $memd, $ns ),
   "create2 with prefix $ns";
 is_deeply $collns2->fetch_object(3), { '6' => 6 }, 'get key 3 from coll2';
 $collns->store_changed();

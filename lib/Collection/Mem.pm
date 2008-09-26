@@ -17,17 +17,17 @@ Class for collections of data, stored in memory.
 
 =cut
 
-use Objects::Collection;
-use Objects::Collection::Base;
-use Objects::Collection::Item;
+use Collection;
+use Collection::Utl::Base;
+use Collection::Utl::Item;
 use Data::Dumper;
 use Test::More;
-use Objects::Collection::ActiveRecord;
+use Collection::Utl::ActiveRecord;
 
 use strict;
 use warnings;
 
-our @ISA     = qw(Objects::Collection);
+our @ISA     = qw(Collection);
 our $VERSION = '0.01';
 
 attributes qw/ _mem_cache /;
@@ -87,7 +87,7 @@ sub _fetch {
 sub _prepare_record {
     my ( $self, $key, $ref ) = @_;
     my %hash;
-    tie %hash, 'Objects::Collection::ActiveRecord', hash => $ref;
+    tie %hash, 'Collection::Utl::ActiveRecord', hash => $ref;
     return \%hash;
 }
 
@@ -114,7 +114,7 @@ __END__
 
 =head1 SEE ALSO
 
-MetaStore, Objects::Collection,README
+MetaStore, Collection,README
 
 =head1 AUTHOR
 

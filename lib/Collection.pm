@@ -26,7 +26,7 @@ use Data::Dumper;
 use Collection::Utl::ActiveRecord;
 use Collection::Utl::Base;
 use Collection::Utl::LazyObject;
-@Collection::ISA     = qw(Collection::Base);
+@Collection::ISA     = qw(Collection::Utl::Base);
 $Collection::VERSION = '0.37';
 attributes qw( _obj_cache );
 

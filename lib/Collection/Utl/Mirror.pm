@@ -1,16 +1,16 @@
-package Objects::Collection::Mirror;
+package Collection::Utl::Mirror;
 
 =head1 NAME
 
- Objects::Collection::Mirror -  Mirror of two collections.
+ Collection::Utl::Mirror -  Mirror of two collections.
 
 =head1 SYNOPSIS
 
-    use Objects::Collection::Mirror;
-     my $coll1 = ( new Collection::Mem:: mem => \%h1 );# fast but nonstable source ( Memcached )
-     my $coll2 = ( new Collection::Mem:: mem => \%h2 );# slow but stable source ( database )
+    use Collection::Utl::Mirror;
+     my $coll1 = ( new Collection::Utl::Mem:: mem => \%h1 );# fast but nonstable source ( Memcached )
+     my $coll2 = ( new Collection::Utl::Mem:: mem => \%h2 );# slow but stable source ( database )
 
-     my $mirror_coll1 =  new Objects::Collection::Mirror:: $coll1, $coll2 ;
+     my $mirror_coll1 =  new Collection::Utl::Mirror:: $coll1, $coll2 ;
 
 
 =head1 DESCRIPTION
@@ -27,9 +27,9 @@ use Carp;
 use Data::Dumper;
 use Test::More;
 require Tie::Hash;
-use Objects::Collection;
-@Objects::Collection::Mirror::ISA     = qw(Objects::Collection);
-$Objects::Collection::Mirror::VERSION = '0.01';
+use Collection;
+@Collection::Utl::Mirror::ISA     = qw(Collection);
+$Collection::Utl::Mirror::VERSION = '0.01';
 
 __PACKAGE__->attributes qw( _c1 _c2 _stack);
 

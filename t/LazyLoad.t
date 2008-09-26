@@ -11,7 +11,7 @@ use Test::More tests =>8 ;
 use Data::Dumper;
 
 BEGIN {
-    use_ok('Objects::Collection::LazyObject');
+    use_ok('Collection::Utl::LazyObject');
 }
 
 package test_for_lazy;
@@ -38,8 +38,8 @@ ok $test_for_lazy::is_load == 1, "check flag after load";
 $obj->set_flag(0);
 ok $test_for_lazy::is_load == 0, "check obj->set_flag(0)";
 
-isa_ok (( my $lazy = new Objects::Collection::LazyObject:: sub { new test_for_lazy:: } ),
-  'Objects::Collection::LazyObject', "create lazy");
+isa_ok (( my $lazy = new Collection::Utl::LazyObject:: sub { new test_for_lazy:: } ),
+  'Collection::Utl::LazyObject', "create lazy");
 ok $test_for_lazy::is_load == 0, "check obj->set_flag(0)";
 $lazy->nop;
 ok $test_for_lazy::is_load == 1, "check create from lazy";

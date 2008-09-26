@@ -1,13 +1,13 @@
-package Objects::Collection::LazyObject;
+package Collection::Utl::LazyObject;
 
 =head1 NAME
 
-Objects::Collection::Object - Lazy call.
+Collection::Object - Lazy call.
 
 =head1 SYNOPSIS
 
-    use Objects::Collection::Object;
-    my $lazy = new Objects::Collection::LazyObject:: 
+    use Collection::Object;
+    my $lazy = new Collection::Utl::LazyObject:: 
             sub { new SomeClass:: %attr };
 
 =head1 DESCRIPTION
@@ -20,7 +20,7 @@ use strict;
 use warnings;
 use strict;
 use Carp;
-$Objects::Collection::LazyObject::VERSION = '0.01';
+$Collection::Utl::LazyObject::VERSION = '0.01';
 no strict 'refs';
 ### install get/set accessors for this object.
 for my $key (qw/   ___sub_ref___  ___obj_ref___ /) {
@@ -53,8 +53,8 @@ sub ___get_object___ {
 
 sub AUTOLOAD {
     my $self = shift;
-    return if $Objects::Collection::LazyObject::AUTOLOAD =~ /::(DESTROY)$/;
-    ( my $auto_sub ) = $Objects::Collection::LazyObject::AUTOLOAD =~ /.*::(.*)/;
+    return if $Collection::Utl::LazyObject::AUTOLOAD =~ /::(DESTROY)$/;
+    ( my $auto_sub ) = $Collection::Utl::LazyObject::AUTOLOAD =~ /.*::(.*)/;
     return $self->___get_object___->$auto_sub(@_);
 
 }
@@ -65,7 +65,7 @@ __END__
 
 =head1 SEE ALSO
 
-Objects::Collection::ActiveRecord, Objects::Collection, README
+Collection::ActiveRecord, Collection, README
 
 =head1 AUTHOR
 

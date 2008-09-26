@@ -5,17 +5,17 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-#use Test::More 'no_plan';    #tests => 'noplan';
+use Test::More 'no_plan';    #tests => 'noplan';
 
-use Test::More tests =>24 ;
+#use Test::More tests =>24 ;
 use lib 't/lib';
 use Data::Dumper;
 
 BEGIN {
-    use_ok('Objects::Collection::Mirror');
+    use_ok('Collection::Utl::ActiveRecord');
+    use_ok('Collection');
+    use_ok('Collection::Utl::Mirror');
     use_ok('Collection::Mem');
-    use_ok('Objects::Collection');
-    use_ok('Objects::Collection::ActiveRecord');
 }
 my $obj;
 my ( %h1, %h2 );
@@ -29,8 +29,8 @@ is_deeply $coll1->fetch_object('1'), { '1' => 11 }, 'fetch key 1 from coll1';
 is_deeply $coll2->fetch_object('2'), { '2' => 22 }, 'fetch key 2 from coll2';
 ok !$coll1->fetch_object('2'), 'non exists key  1 in coll1';
 
-isa_ok my $mirror_coll1 = ( new Objects::Collection::Mirror:: $coll1, $coll2 ),
-  'Objects::Collection::Mirror', 'create mirror';
+isa_ok my $mirror_coll1 = ( new Collection::Utl::Mirror:: $coll1, $coll2 ),
+  'Collection::Utl::Mirror', 'create mirror';
 
 is_deeply \%h1, { '1' => { '1' => 11 } }, 'check orig state of coll1';
 is_deeply \%h2, { '2' => { '2' => 22 } }, 'check orig state of coll2';

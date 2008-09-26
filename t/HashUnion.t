@@ -9,15 +9,15 @@
 use Test::More tests =>17 ;
 use Data::Dumper;
 BEGIN { 
-    use_ok('Objects::Collection::HashUnion');
-    use_ok('Objects::Collection::ActiveRecord');
+    use_ok('Collection::Utl::HashUnion');
+    use_ok('Collection::Utl::ActiveRecord');
     }
 my %hash_1 = ( 1 => 1, 3 => 3 );
 my %hash1;
-tie %hash1, 'Objects::Collection::ActiveRecord', hash => \%hash_1;
+tie %hash1, 'Collection::Utl::ActiveRecord', hash => \%hash_1;
 my %hash2 = ( 2 => 2, 3 => 3 );
 my %hashu;
-tie %hashu, 'Objects::Collection::HashUnion', \%hash1, \%hash2;
+tie %hashu, 'Collection::Utl::HashUnion', \%hash1, \%hash2;
 is_deeply( [ keys %hashu ], [ '1', '2', '3' ], "Check keys" );
 $hashu{4} = 4;
 ok( exists $hashu{4}, "check exists key:4" );
