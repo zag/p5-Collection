@@ -1,15 +1,15 @@
-package Objects::Collection;
+package Collection;
 
 #$Id$
 
 =head1 NAME
 
-Objects::Collection - Collections of data or objects.
+Collection - Collections of data or objects.
 
 =head1 SYNOPSIS
 
-    use Objects::Collection;
-    @Objects::Collection::AutoSQL::ISA = qw(Objects::Collection);
+    use Collection;
+    @Collection::AutoSQL::ISA = qw(Collection);
 
 =head1 DESCRIPTION
 
@@ -23,11 +23,11 @@ use strict;
 use warnings;
 use Carp;
 use Data::Dumper;
-use Objects::Collection::ActiveRecord;
-use Objects::Collection::Base;
-use Objects::Collection::LazyObject;
-@Objects::Collection::ISA     = qw(Objects::Collection::Base);
-$Objects::Collection::VERSION = '0.37';
+use Collection::Utl::ActiveRecord;
+use Collection::Utl::Base;
+use Collection::Utl::LazyObject;
+@Collection::ISA     = qw(Collection::Base);
+$Collection::VERSION = '0.37';
 attributes qw( _obj_cache );
 
 sub _init {
@@ -273,7 +273,7 @@ Not really return lazy object.
 
 sub get_lazy_object {
     my ( $self, $id ) = @_;
-    return new Objects::Collection::LazyObject::
+    return new Collection::LazyObject::
       sub { $self->fetch_object($id) };
 }
 
@@ -311,7 +311,7 @@ __END__
 
 =head1 SEE ALSO
 
-Objects::Collection::AutoSQL, README
+Collection::AutoSQL, README
 
 =head1 AUTHOR
 
