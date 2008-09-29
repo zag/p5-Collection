@@ -4,7 +4,7 @@ package Collection;
 
 =head1 NAME
 
-    Collection - Collections framework for to B<CRUD> data or objects.
+Collection - Collections framework for to B<CRUD> data or objects.
 
 =head1 SYNOPSIS
 
