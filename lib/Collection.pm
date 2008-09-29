@@ -4,16 +4,74 @@ package Collection;
 
 =head1 NAME
 
-Collection - Collections of data or objects.
+    Collection - Collections framework for to B<CRUD> data or objects.
 
 =head1 SYNOPSIS
 
+    package MyCollection;
     use Collection;
-    @Collection::AutoSQL::ISA = qw(Collection);
+    @MyCollection::ISA = qw(Collection);
 
 =head1 DESCRIPTION
 
-A collection - sometimes called a container - is simply an object that groups multiple elements into a single unit. Collections are used to store, retrieve, manipulate, and communicate aggregate data.
+A collection - sometimes called a container - is simply an object that groups multiple elements into a single unit. I<Collection> are used to store, retrieve, manipulate, and communicate aggregate data.
+
+The primary advantages of a I<Collection> framework are that it reduces programming effort by providing useful data structures and algorithms so you don't have to write them yourself.
+
+
+The I<Collection> framework consists of:
+
+=over 2
+
+=item * Wrapper Implementations - Add functionality, such as mirroring and lazy load, to other implementations.
+
+=item * Algorithms - methods that perform useful functions, such as caching.
+
+=back
+
+This module has a task - to be a base class for ather Collections.
+You can inherit the methods B<_create>, B<_delete>, B<_fetch>, B<_store> and may be B<_prepare_record> for new source of data. As you see this is similar to B<CRUD> (Create - Read - Update- Delete).
+
+Sample:
+
+        my $col = new MyCollection:: <some params>;
+        #fetch objects or data by keys
+        my $data = $col->fetch(1,2,3,4,5);
+        #do something
+        foreach my $item ( values %$data) {
+            $_->attr->{inc} ++
+        }
+        #You can use "lazy" functionality
+        my $not_actualy_fetch = $col->get_lazy(6,7,8,9);
+        #store changed data or objects
+        $col->store;
+        #free memory
+        $col->release;
+
+
+Sample from L<Collection::AutoSQL>:
+
+ my $beers = new Collection::AutoSQL::
+  dbh     => $dbh,          #database connect
+  table   => 'beers',       #table name
+  field   => 'bid',         #key field (IDs), usually primary,autoincrement
+  cut_key => 1;             #delete field 'bid' from readed records,
+    
+    my $heineken = $beers->fetch_one(1);
+    #SELECT * FROM beers WHERE bid in (1)
+
+
+Sample from L<Collection::Memcached>:
+
+    use Collection::Memcached;
+    use Cache::Memcached;
+    $memd = new Cache::Memcached {
+    'servers' => [ "127.0.0.1:11211" ],
+    'debug' => 0,
+    'compress_threshold' => 10_000,
+  };
+  my $collection = new Collection::Memcached:: $memd;
+  my $collection_prefix = new Collection::Memcached:: $memd, 'prefix';
 
 =head1 METHODS
 
@@ -27,7 +85,7 @@ use Collection::Utl::ActiveRecord;
 use Collection::Utl::Base;
 use Collection::Utl::LazyObject;
 @Collection::ISA     = qw(Collection::Utl::Base);
-$Collection::VERSION = '0.37';
+$Collection::VERSION = '0.38';
 attributes qw( _obj_cache );
 
 sub _init {
@@ -134,15 +192,16 @@ sub create {
     return $self->fetch( keys %$results );
 }
 
-=head2 fetch_one(ID1)
+=head2 fetch_one(ID1), get_one(ID1)
 
-Public method. Fetch object from collection for given ID.
+Public methods. Fetch object from collection for given ID.
 Return ref to objects or undef unless exists.
 
 =cut
 
-sub fetch_object {
-    die $_[0]->_deprecated('fetch_one');
+sub get_one {
+    my $self = shift;
+    return $self->fetch_one(@_);
 }
 
 sub fetch_one {
@@ -154,9 +213,9 @@ sub fetch_one {
     return $res;
 }
 
-=head2 fetch(ID1 [, ID2, ...])
+=head2 fetch(ID1 [, ID2, ...]) , get(ID1 [, ID2, ...])
 
-Public method. Fetch objects from collection for given IDs.
+Public methods. Fetch objects from collection for given IDs.
 Return ref to HASH, where where keys is IDs, values is objects refs.
 
 
@@ -165,8 +224,9 @@ Parametrs:
 
 =cut
 
-sub fetch_objects {
-    die $_[0]->_deprecated('fetch');
+sub get {
+    my $self = shift;
+    return $self->fetch(@_)
 }
 
 sub fetch {
@@ -203,10 +263,6 @@ Release from collection objects with IDs. Only delete given keys from collection
 
 =cut
 
-sub release_objects {
-    die $_[0]->_deprecated('release');
-}
-
 sub release {
     my $self = shift;
     my (@ids) = map { ref($_) ? $_ : { id => $_ } } @_;
@@ -231,7 +287,7 @@ sub release {
 =head2 store([ID1,[ID2,...]]) 
 
 Call _store for changed objects.
-Store all  all loaded objects without parameters:
+Store all loaded objects without parameters:
 
     $simple_collection->store(); #store all changed
 
@@ -240,11 +296,6 @@ or (for 1,2,6 IDs )
     $simple_collection->store(1,2,6);
 
 =cut
-
-sub store_changed {
-    die $_[0]->_deprecated('store');
-
-}
 
 sub store {
     my $self      = shift;
@@ -271,12 +322,7 @@ objects ID1,ID2...
 
     $simple_collection->delete(1,5,84);
 
-
 =cut
-
-sub delete_objects {
-    die $_[0]->_deprecated('delete');
-}
 
 sub delete {
     my $self = shift;
@@ -292,19 +338,10 @@ Not really return lazy object.
 
 =cut
 
-sub get_lazy_object {
-    die $_[0]->_deprecated('get_lazy');
-
-}
-
 sub get_lazy {
     my ( $self, $id ) = @_;
     return new Collection::Utl::LazyObject:: sub { $self->fetch_one($id) };
 }
-
-=head2
-
-=cut
 
 sub get_changed_id {
     my $self     = shift;
@@ -336,7 +373,7 @@ __END__
 
 =head1 SEE ALSO
 
-Collection::AutoSQL, README
+Collection::Memcached, Collection::Mem, Collection::AutoSQL, README
 
 =head1 AUTHOR
 

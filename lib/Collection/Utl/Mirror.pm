@@ -2,7 +2,7 @@ package Collection::Utl::Mirror;
 
 =head1 NAME
 
- Collection::Utl::Mirror -  Mirror of two collections.
+ Collection::Utl::Mirror -  Mirror two collections.
 
 =head1 SYNOPSIS
 

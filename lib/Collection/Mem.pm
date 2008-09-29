@@ -11,7 +11,7 @@ MetaStore::Mem - class for collections of data, stored in memory.
 
 =head1 DESCRIPTION
 
-Class for collections of data, stored in memory.
+Class for collection of data, stored in memory.
 
 =head1 METHODS
 
@@ -100,6 +100,7 @@ sub _store {
     my $self  = shift;
 #    diag Dumper (\@_)    
 }
+
 sub commit {
     my $self = shift;
 }
