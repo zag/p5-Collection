@@ -1,5 +1,7 @@
 Revision history for Perl extension Collection.
 
+0.39
+    -fix Collection::AutoSQLnotUnique
 0.38 
     - fix api add docs
 0.37

@@ -1,14 +1,14 @@
-package Objects::Collection::AutoSQLnotUnique;
+package Collection::AutoSQLnotUnique;
 
 
 =head1 NAME
 
- Objects::Collection::AutoSQLnotUnique - class for collections of data, stored in database.
+Collection::AutoSQLnotUnique - class for collections of data, stored in database.
 
 =head1 SYNOPSIS
 
-  use Objects::Collection::AutoSQL;
-  my $metaobj = new Objects::Collection::AutoSQL::
+  use Collection::AutoSQL;
+  my $metaobj = new Collection::AutoSQL::
       dbh => $dbh,         #database connect
       table => 'metadata', #table name
       field=> 'mid',       #key field (IDs)
@@ -24,13 +24,13 @@ Provide simply access to records, with not unique key field.
 
 =cut
 
-use Objects::Collection::AutoSQL;
+use Collection::AutoSQL;
 use Data::Dumper;
 use Carp;
 use strict;
 use warnings;
 
-our @ISA = qw(Objects::Collection::AutoSQL);
+our @ISA = qw(Collection::AutoSQL);
 our $VERSION = '0.01';
 
 #overwrite this method !
@@ -145,7 +145,7 @@ __END__
 
 =head1 SEE ALSO
 
-Objects::Collection::AutoSQL, Objects::Collection, README
+Collection::AutoSQL, Collection, README
 
 =head1 AUTHOR
 
@@ -153,7 +153,7 @@ Zahatski Aliaksandr, <zag@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2006 by Zahatski Aliaksandr
+Copyright (C) 2005-2008 by Zahatski Aliaksandr
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

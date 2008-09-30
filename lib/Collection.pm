@@ -85,7 +85,7 @@ use Collection::Utl::ActiveRecord;
 use Collection::Utl::Base;
 use Collection::Utl::LazyObject;
 @Collection::ISA     = qw(Collection::Utl::Base);
-$Collection::VERSION = '0.38';
+$Collection::VERSION = '0.39';
 attributes qw( _obj_cache );
 
 sub _init {
