@@ -2,12 +2,12 @@ package Collection::Mem;
 
 =head1 NAME
 
-MetaStore::Mem - class for collections of data, stored in memory.
+Collection::Mem - class for collections of data, stored in memory.
 
 =head1 SYNOPSIS
 
-    use MetaStore::Mem;
-    my $meta = new MetaStore::Mem:: mem=>$hash1;
+    use Collection::Mem;
+    my $meta = new Collection::Mem:: mem=>$hash1;
 
 =head1 DESCRIPTION
 
