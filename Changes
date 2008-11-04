@@ -1,5 +1,7 @@
 Revision history for Perl extension Collection.
 
+0.41
+    -fix deps;
 0.40
     -fix docs;
     -fix dependes

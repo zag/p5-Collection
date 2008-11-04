@@ -103,7 +103,7 @@ use Collection;
 use Collection::Utl::Base;
 use Collection::Utl::ActiveRecord;
 @Collection::AutoSQL::ISA     = qw(Collection);
-$Collection::AutoSQL::VERSION = '0.02';
+$Collection::AutoSQL::VERSION = '0.04';
 attributes qw( _dbh _table_name _key_field _is_delete_key_field _sub_ref);
 
 sub _init {
@@ -300,7 +300,7 @@ sub _fetch_ids {
 sub _prepare_record {
     my ( $self, $key, $ref ) = @_;
     my %hash;
-    tie %hash, 'Collection::ActiveRecord', hash => $ref;
+    tie %hash, 'Collection::Utl::ActiveRecord', hash => $ref;
     if ( ref( $self->_sub_ref ) eq 'CODE' ) {
         return $self->_sub_ref()->( $key, \%hash );
     }
@@ -338,7 +338,7 @@ Zahatski Aliaksandr, <zag@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2007 by Zahatski Aliaksandr
+Copyright (C) 2005-2008 by Zahatski Aliaksandr
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
