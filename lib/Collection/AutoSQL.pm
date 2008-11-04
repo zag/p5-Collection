@@ -69,7 +69,7 @@ For exampe:
  #UPDATE beers SET bcount='2',bname='heineken' where bid=1
  #UPDATE beers SET bcount='4',bname='karhu' where bid=5
 
- my $hash = $beers->fetch_one({bcount=>[4,1]});
+ my $hash = $beers->fetch({bcount=>[4,1]});
  #SELECT * FROM beers WHERE  ( bcount in (4,1) )
  
  print Dumper($hash);
@@ -100,8 +100,8 @@ use warnings;
 use Data::Dumper;
 use Carp;
 use Collection;
-use Collection::Base;
-use Collection::ActiveRecord;
+use Collection::Utl::Base;
+use Collection::Utl::ActiveRecord;
 @Collection::AutoSQL::ISA     = qw(Collection);
 $Collection::AutoSQL::VERSION = '0.02';
 attributes qw( _dbh _table_name _key_field _is_delete_key_field _sub_ref);
