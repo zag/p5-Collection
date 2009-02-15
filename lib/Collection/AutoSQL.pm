@@ -104,7 +104,8 @@ use Collection::Utl::Base;
 use Collection::Utl::ActiveRecord;
 @Collection::AutoSQL::ISA     = qw(Collection);
 $Collection::AutoSQL::VERSION = '0.04';
-attributes qw( _dbh _table_name _key_field _is_delete_key_field _sub_ref);
+attributes
+  qw( _dbh _table_name _key_field _is_delete_key_field _sub_ref _fields);
 
 sub _init {
     my $self = shift;
@@ -113,6 +114,7 @@ sub _init {
     $self->_table_name( $arg{table} );
     $self->_key_field( $arg{field} );
     $self->_is_delete_key_field( $arg{delete_key} || $arg{cut_key} );
+    $self->_fields( $arg{fields} || {} );
     $self->_sub_ref( $arg{sub_ref} );
     $self->SUPER::_init(@_);
 }
@@ -172,8 +174,7 @@ sub _store {
         my $prepared = $self->before_save($tmp_val);
         my @rows     = ref($prepared) eq 'ARRAY' ? @$prepared : ($prepared);
         foreach my $val (@rows) {
-            my @records =
-              map {
+            my @records = map {
                 [ $_, $dbh->quote( defined( $val->{$_} ) ? $val->{$_} : '' ) ]
               }
               keys %$val;
@@ -185,11 +186,103 @@ sub _store {
         }    #foreach
     }    #while
 }
+
+=head2 _expand_rules ( <term1>[, <term2> ] )
+
+convert array of terms to scructs with type field
+
+Got 
+    { test => 1, guid => $two },'key'
+
+Return array:
+
+    (
+
+        {
+            'values' => [1],
+            'term'   => '=',
+            'field'  => 'test'
+        },
+        {
+            'values' => ['4D56A984-0B5E-11DC-8292-3DE558089BC5'],
+            'term'   => '=',
+            'field'  => 'guid',
+            'type' => 'varchar'
+        }
+    )
+
+=cut
+
+sub _expand_rules {
+    my $self  = shift;
+    my @res   = ();
+    my $field = $self->_key_field;
+
+    #group { id =>'1221'}, {id=>'212'} to
+    # { field=>[ '1221', '212' ] }
+    my @grouped = ();
+    foreach my $exp (@_) {
+        if ( ref($exp) ) {
+
+            # convert scalar values to ref
+            for ( values %$exp ) {
+                $_ = [$_] unless ref($_);
+            }
+            push @grouped, $exp;
+        }
+        else {
+
+            #got key
+            my $last_rec = $grouped[-1];
+
+            #check if  previus element is key value
+            if (    $last_rec
+                and exists $last_rec->{$field}
+                and ( keys(%$last_rec) == 1 ) )
+            {
+                push @{ $last_rec->{$field} }, $exp;
+
+            }
+            else {
+                push @grouped, { $field => [$exp] };
+            }
+
+        }
+    }
+
+    #now convert passed hashes to special structs with type
+    my @result = ();
+    my $fields = $self->_fields;
+    foreach my $rec (@grouped) {
+        my @group = ();
+        while ( my ( $field_name, $values ) = each %$rec ) {
+
+            #fill term
+            my $term = '=';    #default term value
+                               #clear fielname from terms
+            if ( $field_name =~ s%([<>])%% ) {
+                $term = $1;
+            }
+            my %rule =
+              ( field => $field_name, 'values' => $values, term => $term );
+
+            #fill type
+            if ( my $type = $fields->{$field_name} ) {
+                $rule{type} = $type;
+            }
+            push @group, \%rule;
+        }
+        push @result, \@group;
+    }
+    return @result;
+}
+
 =head2 _prepare_where <query hash>
 
 return <where>  expression or undef else
 
 =cut
+
 sub _prepare_where {
     my $self  = shift;
     my $dbh   = $self->_dbh();
@@ -220,7 +313,8 @@ sub _prepare_where {
                 push @and_where, qq!$key in ($vals)!;
             }
         }
-        push @add_where, " ( " . join( " and ", @and_where ) . " ) " if @and_where;
+        push @add_where, " ( " . join( " and ", @and_where ) . " ) "
+          if @and_where;
     }
     my $extr_where = join " or ", @add_where if @add_where;
     return $extr_where;
@@ -258,7 +352,10 @@ sub _create {
         delete $arg{$field};
     }
     my @keys = keys %arg;
-    my $str = "INSERT INTO  $table_name (" . join( ",", @keys ) . ") VALUES ("
+    my $str =
+        "INSERT INTO  $table_name (" 
+      . join( ",", @keys ) 
+      . ") VALUES ("
       . join( ",",
         map { $self->_dbh()->quote( defined($_) ? $_ : '' ) }
           map { $arg{$_} } @keys )
@@ -281,8 +378,7 @@ sub _delete {
     my $table_name = $self->_table_name();
     my $field      = $self->_key_field;
     return [] unless scalar @_;
-    my $str =
-      "DELETE FROM $table_name WHERE $field IN ("
+    my $str = "DELETE FROM $table_name WHERE $field IN ("
       . join( ",", map { $_->{id} } @_ ) . ")";
     $self->_query_dbh($str);
     return \@_;
@@ -295,6 +391,11 @@ sub _fetch_ids {
     my $field      = $self->_key_field;
     my $query      = "SELECT $field FROM $table_name";
     return $dbh->selectcol_arrayref($query);
+}
+
+sub list_ids {
+    my $self = shift;
+    return $self->_fetch_ids;
 }
 
 sub _prepare_record {
@@ -318,7 +419,7 @@ sub GetLastID {
     my $self       = shift;
     my $table_name = $self->_table_name();
     my $field      = $self->_key_field;
-    my $res        =
+    my $res =
       $self->_query_dbh("select max($field)as res from $table_name")
       ->fetchrow_hashref;
     return $res->{res};

@@ -1,5 +1,8 @@
 Revision history for Perl extension Collection.
 
+0.42
+    - add expand_rules for support type of fields at Collection::AutoSQL
+    - add Collection::Storable for store data in files
 0.41
     -fix deps;
 0.40

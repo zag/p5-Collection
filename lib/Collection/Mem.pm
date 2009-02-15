@@ -49,14 +49,15 @@ sub _delete {
 
 sub _create {
     my $self = shift;
-#    diag "Create" . Dumper( \@_ );
+    my $coll  = $self->_mem_cache;
     if ( @_ > 1 ) {
-        die "_create in many attribs";
+        my %new_keys_vals = @_;
+        %{$coll} = ( %$coll, %new_keys_vals );
+        return \%new_keys_vals;
     }
     my %res   = ();
     my $attrs =  shift ;
     
-    my $coll  = $self->_mem_cache;
     if ( ref($attrs) eq 'HASH' ) {
 
         #merge with already exists
