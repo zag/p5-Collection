@@ -1,5 +1,6 @@
 Revision history for Perl extension Collection.
 0.43
+    - add terms ( < > = ) in fetch params
     - simplification fetch code and api for _fetch, _delete methods
 0.42
     - add expand_rules for support type of fields at Collection::AutoSQL

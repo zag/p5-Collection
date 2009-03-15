@@ -297,19 +297,20 @@ sub _prepare_where {
         my @sql_and = ();
         foreach my $rec (@$group) {
 
-            my $values = [@{ $rec->{'values'} }];
+            my $values = [ @{ $rec->{'values'} } ];
             my $type   = $rec->{'type'};
             my $term   = $rec->{'term'};
             my $field  = $rec->{'field'};
 
             #process varchar values
-            if (defined $type) {
-                if ( $type eq 'varchar') {
+            if ( defined $type ) {
+                if ( $type eq 'varchar' ) {
                     $_ = $dbh->quote($_) for @$values;
                 }
-            } else {
-            for ( @$values ) {
-                $_ = $dbh->quote($_) if !/^\d+$/ 
+            }
+            else {
+                for (@$values) {
+                    $_ = $dbh->quote($_) if !/^\d+$/;
                 }
 
             }
@@ -322,7 +323,15 @@ sub _prepare_where {
             # check type and = or like !
             #
             #
-            push @sql_and, "$field in (" . join( ",", @$values ) . ")";
+            my $values_sql;
+            if ( scalar @$values > 1 ) {
+                $values_sql = "(" . join( ",", @$values ) . ")";
+                $sql_term = "in" if $sql_term eq '=';
+            }
+            else {
+                $values_sql = "@$values";
+            }
+            push @sql_and, "$field $sql_term $values_sql";
         }
         push @sql_or, "(" . join( " and ", @sql_and ) . ")";
     }
@@ -387,8 +396,8 @@ sub _delete {
     my $table_name = $self->_table_name();
     my $field      = $self->_key_field;
     return [] unless scalar @_;
-    my $str = "DELETE FROM $table_name WHERE $field IN ("
-      . join( ",",  @_ ) . ")";
+    my $str =
+      "DELETE FROM $table_name WHERE $field IN (" . join( ",", @_ ) . ")";
     $self->_query_dbh($str);
     return \@_;
 }
