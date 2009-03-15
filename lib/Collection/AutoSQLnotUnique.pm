@@ -53,12 +53,7 @@ sub _fetch {
   my @extra_id;
   my @docs;
   foreach (@_) {
-     if ( $_->{id} ) {
-         push @docs, $_->{id};
-      }
-      else {
-          push @extra_id, $_;
-      }
+      ref $_ ? push @extra_id, $_ : push @docs, $_
   }
   my @add_where;
   if (  
@@ -67,10 +62,10 @@ sub _fetch {
         my $ext_where = $self->_prepare_where(@extra_id)
      ) {
      push @docs, @{ $self->get_ids_where($ext_where) };
-     return $self->_fetch(map { { id=>$_ } } @docs)
+     return $self->_fetch( @docs)
   } else {
     return {} unless @docs;
-    my $where = $self->_prepare_where(map {{id=>$_}} @docs);
+    my $where = $self->_prepare_where(@docs);
     my $str ="SELECT * FROM $table_name WHERE $where";
     my $result = {};
     my %keys_hash;

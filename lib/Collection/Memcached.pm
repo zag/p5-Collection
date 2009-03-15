@@ -61,7 +61,7 @@ sub _init {
 
 sub _delete {
     my $self = shift;
-    my @ids  = map { $_->{id} } @_;
+    my @ids  = @_;
     my $memd = $self->_mem_cache;
     my $ns   = $self->_ns;
     if ( defined $ns ) {
@@ -88,7 +88,7 @@ sub _create {
 
 sub _fetch {
     my $self = shift;
-    my @ids  = map { $_->{id} } @_;
+    my @ids  =  @_;
     my $ns   = $self->_ns;
     if ( defined $ns ) {
 

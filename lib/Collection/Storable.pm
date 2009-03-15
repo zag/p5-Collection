@@ -89,7 +89,7 @@ sub path2key {
 
 sub _delete {
     my $self = shift;
-    my @ids  = map { $_->{id} } @_;
+    my @ids  =  @_;
     my $path = $self->_store_path;
 
     #convert ids to pathes
@@ -107,7 +107,7 @@ sub _create {
 
 sub _fetch {
     my $self = shift;
-    my @ids  = map { $_->{id} } @_;
+    my @ids  =  @_;
     my $path = $self->_store_path;
 
     #convert keys to path

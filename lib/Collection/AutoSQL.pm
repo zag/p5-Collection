@@ -289,35 +289,44 @@ sub _prepare_where {
     my $field = $self->_key_field;
     my @extra_id;
     my @docs;
-    foreach (@_) {
-        if ( defined $_->{id} ) {
-            push @docs, $_->{id};
-        }
-        else {
-            push @extra_id, $_;
-        }
 
-    }
-    my @add_where;
-    push @add_where, "$field in (" . join( "," => @docs ) . ")" if @docs;
-    foreach my $exp (@extra_id) {
-        my @and_where;
-        while ( my ( $key, $val ) = each %$exp ) {
-            my $vals = join ",",
-              map { /^\d+$/ ? $_ : $dbh->quote($_) }
-              ( ref($val) ? @$val : ($val) );
-            if ( $key =~ s%([<>])%% ) {
-                push @and_where, qq!$key $1 $vals!;
+    # group ids and add fill type of fields
+    my @processed = $self->_expand_rules(@_);
+    my @sql_or    = ();
+    foreach my $group (@processed) {
+        my @sql_and = ();
+        foreach my $rec (@$group) {
+
+            my $values = [@{ $rec->{'values'} }];
+            my $type   = $rec->{'type'};
+            my $term   = $rec->{'term'};
+            my $field  = $rec->{'field'};
+
+            #process varchar values
+            if (defined $type) {
+                if ( $type eq 'varchar') {
+                    $_ = $dbh->quote($_) for @$values;
+                }
+            } else {
+            for ( @$values ) {
+                $_ = $dbh->quote($_) if !/^\d+$/ 
+                }
+
             }
-            else {
-                push @and_where, qq!$key in ($vals)!;
-            }
+
+            #construct query
+            my $sql_term = $term;
+
+            #this
+            #
+            # check type and = or like !
+            #
+            #
+            push @sql_and, "$field in (" . join( ",", @$values ) . ")";
         }
-        push @add_where, " ( " . join( " and ", @and_where ) . " ) "
-          if @and_where;
+        push @sql_or, "(" . join( " and ", @sql_and ) . ")";
     }
-    my $extr_where = join " or ", @add_where if @add_where;
-    return $extr_where;
+    return join " or ", @sql_or;
 }
 
 sub _fetch {
@@ -379,7 +388,7 @@ sub _delete {
     my $field      = $self->_key_field;
     return [] unless scalar @_;
     my $str = "DELETE FROM $table_name WHERE $field IN ("
-      . join( ",", map { $_->{id} } @_ ) . ")";
+      . join( ",",  @_ ) . ")";
     $self->_query_dbh($str);
     return \@_;
 }

@@ -42,7 +42,7 @@ sub _init {
 
 sub _delete {
     my $self = shift;
-    my @ids  = map { $_->{id} } @_;
+    my @ids  =  @_;
     my $coll = $self->_mem_cache;
     delete @{$coll}{@ids};
 }
@@ -76,7 +76,7 @@ sub _create {
 
 sub _fetch {
     my $self = shift;
-    my @ids  = map { $_->{id} } @_;
+    my @ids  =  @_;
     my $coll = $self->_mem_cache;
     my %res;
     for (@ids) {
@@ -99,7 +99,6 @@ sub _fetch_all {
 
 sub _store {
     my $self  = shift;
-#    diag Dumper (\@_)    
 }
 
 sub commit {

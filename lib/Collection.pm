@@ -85,7 +85,7 @@ use Collection::Utl::ActiveRecord;
 use Collection::Utl::Base;
 use Collection::Utl::LazyObject;
 @Collection::ISA     = qw(Collection::Utl::Base);
-$Collection::VERSION = '0.42';
+$Collection::VERSION = '0.43';
 attributes qw( _obj_cache );
 
 sub _init {
@@ -110,7 +110,7 @@ sub _store {
     croak "$pkg doesn't define an _store method";
 }
 
-=head2 _fetch({id=>ID1} [, {id=>ID2}, ...])
+=head2 _fetch(ID1[, ID2, ...])
 
 Read data for given IDs. Must return reference to hash, where keys is IDs,
 values is readed data.
@@ -143,7 +143,7 @@ sub _create {
     croak "$pkg doesn't define an _create method";
 }
 
-=head2 _delete(ID1[, ID2, ...]) or ({  id=>ID1 } [, {id => ID2 }, ...])
+=head2 _delete(ID1[, ID2, ...]) 
 
 Delete records in data storage for given IDs.
 
@@ -230,31 +230,48 @@ sub get {
 }
 
 sub fetch {
-    my $self = shift;
-    my (@ids) =
-      map { ref($_) ? $_ : { id => $_ } } grep { defined $_ } @_;
-    return unless @ids;
+    my $self     = shift;
+    my @ids      = ();
     my $coll_ref = $self->_obj_cache();
-    my (@fecth) =
-      grep { !exists $_->{id} or !exists $coll_ref->{ $_->{id} } } @ids;
-    if ( scalar(@fecth)
-        && ( my $results = $self->_fetch(@fecth) ) )
-    {
+    my @fetch    = ();
+    my @exists   = ();
+    my @fetched = ();
+    foreach my $id (@_) {
+        next
+          unless defined $id;
 
-        map {
-            my $ref = $self->_prepare_record( $_, $results->{$_} );
-            $coll_ref->{$_} = $ref if ref($ref);
-          }
-
-          #filter aleady loaded objects
-          grep { !exists $coll_ref->{$_} }
-          keys %{$results};
-        push @ids, map { { id => $_ } } keys %{$results};
+        #push nonexists or references to @fetch
+        if ( exists $coll_ref->{$id} ) {
+            push @exists, $id;
+            next;
+        }
+        push @fetch, $id;
     }
-    return {
-        map { $_->{id} => $coll_ref->{ $_->{id} } }
-          grep { exists $_->{id} and exists $coll_ref->{ $_->{id} } } @ids
-    };
+    if ( scalar(@fetch)
+        && ( my $results = $self->_fetch(@fetch) ) )
+    {
+        while ( my ( $key, $val ) = each %{$results} ) {
+            push @fetched, $key;
+            #filter already loaded
+            next if exists $coll_ref->{$key};
+
+            #bless for loaded
+            my $ref = $self->_prepare_record( $key, $results->{$key} );
+            if ( ref($ref) ) {
+                $coll_ref->{$key} = $ref;
+
+                #store loaded keys
+                push @exists, $key;
+            } else {
+                warn "Fail prepare for $key";
+            }
+        }
+    }
+    my %result = ();
+    foreach my $key (@exists, @fetched) {
+        $result{$key} = $coll_ref->{$key};
+    }
+    return \%result;
 }
 
 =head2 release(ID1[, ID2, ...])
@@ -265,10 +282,10 @@ Release from collection objects with IDs. Only delete given keys from collection
 
 sub release {
     my $self = shift;
-    my (@ids) = map { ref($_) ? $_ : { id => $_ } } @_;
+    my (@ids) =  @_;
     my $coll_ref = $self->_obj_cache();
     unless (@ids) {
-        my $res = [ map { { id => $_ } } keys %$coll_ref ];
+        my $res = [ keys %$coll_ref ];
         undef %{$coll_ref};
         return $res;
     }
@@ -276,10 +293,10 @@ sub release {
 
         [
             map {
-                delete $coll_ref->{ $_->{id} };
+                delete $coll_ref->{ $_ };
                 $_
               }
-              map { ref($_) ? $_ : { id => $_ } } @ids
+             @ids
         ];
     }    #else
 }
@@ -326,7 +343,7 @@ objects ID1,ID2...
 
 sub delete {
     my $self = shift;
-    my (@ids) = map { ref($_) ? $_ : { id => $_ } } @_;
+    my (@ids) =  @_;
     $self->release(@ids);
     $self->_delete(@ids);
 }

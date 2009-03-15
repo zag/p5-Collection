@@ -57,7 +57,7 @@ sub _fetch {
     my $self = shift;
 
     #collect ids to fetch
-    my @ids = map { $_->{id} } @_;
+    my @ids =  @_;
     return {} unless @ids;    #skip empty ids list
     my ( $c1, $c2 ) = @{ $self->_stack };
 
