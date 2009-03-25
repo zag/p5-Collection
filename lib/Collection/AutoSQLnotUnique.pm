@@ -114,7 +114,8 @@ sub _store {
     my $table_name = $self->_table_name();
     my $field      = $self->_key_field;
     my @id2del = keys %$ref;
-    $self->_query_dbh("DELETE FROM $table_name where $field in (".(join ','=>@id2del).")");
+    #$self->_query_dbh("DELETE FROM $table_name where $field in (".(join ','=>@id2del).")", @id2del );
+    $self->SUPER::_delete(@id2del);
     my $sth;
     my @fields;
     while ( my ( $key, $rec_ref ) = each %$ref ) {

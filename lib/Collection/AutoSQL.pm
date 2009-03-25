@@ -160,13 +160,12 @@ sub _query_dbh {
     my $query = shift;
     my $dbh   = $self->_dbh;
     my $sth   = $dbh->prepare($query) or croak $dbh::errstr. "\nSQL: $query";
-    $sth->execute or croak $dbh::errstr. "\nSQL: $query";
+    $sth->execute(@_) or croak $dbh::errstr. "\nSQL: $query";
     return $sth;
 }
 
 sub _store {
     my ( $self, $ref ) = @_;
-    my $dbh        = $self->_dbh();
     my $table_name = $self->_table_name();
     my $field      = $self->_key_field;
     while ( my ( $key, $rec_ref ) = each %$ref ) {
@@ -174,15 +173,14 @@ sub _store {
         my $prepared = $self->before_save($tmp_val);
         my @rows     = ref($prepared) eq 'ARRAY' ? @$prepared : ($prepared);
         foreach my $val (@rows) {
-            my @records = map {
-                [ $_, $dbh->quote( defined( $val->{$_} ) ? $val->{$_} : '' ) ]
-              }
+            my @records =
+              map { [ $_, defined( $val->{$_} ) ? $val->{$_} : '' ] }
               keys %$val;
             my $query =
                 "UPDATE $table_name SET "
-              . join( ",", map { qq!$_->[0]=$_->[1]! } @records )
-              . " where $field=$key";
-            $self->_query_dbh($query);
+              . join( ",", map { qq!$_->[0]=\?! } @records )
+              . " where $field=?";
+            $self->_query_dbh( $query, map ( $_->[1], @records ), $key );
         }    #foreach
     }    #while
 }
@@ -396,9 +394,9 @@ sub _delete {
     my $table_name = $self->_table_name();
     my $field      = $self->_key_field;
     return [] unless scalar @_;
-    my $str =
-      "DELETE FROM $table_name WHERE $field IN (" . join( ",", @_ ) . ")";
-    $self->_query_dbh($str);
+    my $str = "DELETE FROM $table_name WHERE $field IN ("
+      . join( ",", qw/?/ x @_ ) . ")";
+    $self->_query_dbh( $str, @_ );
     return \@_;
 }
 

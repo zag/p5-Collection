@@ -1,4 +1,6 @@
 Revision history for Perl extension Collection.
+0.44
+    - support bind_values in execute (SQL collection)
 0.43
     - add terms ( < > = ) in fetch params
     - simplification fetch code and api for _fetch, _delete methods
