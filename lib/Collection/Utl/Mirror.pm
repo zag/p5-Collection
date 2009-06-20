@@ -173,9 +173,12 @@ sub list_ids {
 sub _delete {
     my $self = shift;
     my ( $c1, $c2 ) = @{ $self->_stack };
+    my %res = ();
     for ( $c1, $c2 ) {
-        $_->delete(@_)
+        #save results
+        @res { @{ $_->delete(@_) || [] } } =();
     }
+    [keys %res]
 }
 1;
 __END__

@@ -72,6 +72,9 @@ sub _delete {
         }
     }
     $memd->delete($_) for @ids;
+
+    #return array of deleted
+    [@ids];
 }
 
 sub _create {
@@ -88,7 +91,7 @@ sub _create {
 
 sub _fetch {
     my $self = shift;
-    my @ids  =  @_;
+    my @ids  = @_;
     my $ns   = $self->_ns;
     if ( defined $ns ) {
 
