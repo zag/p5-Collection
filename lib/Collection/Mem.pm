@@ -42,27 +42,40 @@ sub _init {
 
 sub _delete {
     my $self = shift;
-    my @ids  =  @_;
+    my @ids  = @_;
     my $coll = $self->_mem_cache;
     delete @{$coll}{@ids};
+    [@ids];
 }
 
 sub _create {
     my $self = shift;
-    my $coll  = $self->_mem_cache;
+    my $coll = $self->_mem_cache;
     if ( @_ > 1 ) {
         my %new_keys_vals = @_;
-        %{$coll} = ( %$coll, %new_keys_vals );
-        return \%new_keys_vals;
+        my %res           = ();
+
+        # resolve hash refs to new hashes
+        while ( my ( $key, $val ) = each %new_keys_vals ) {
+            %{ $coll->{$key} } = %$val;
+            $res{$key} = $coll->{$key};
+        }
+        return \%res;
     }
     my %res   = ();
-    my $attrs =  shift ;
-    
+    my $attrs = shift;
+
     if ( ref($attrs) eq 'HASH' ) {
 
         #merge with already exists
-        %{$coll} = ( %$coll, %$attrs );
-        %res = %$attrs;
+        # resolve hash refs to new hashes
+        while ( my ( $key, $val ) = each %$attrs ) {
+            %{ $coll->{$key} } = %$val;
+            $res{$key} = $coll->{$key};
+        }
+
+        #        %{$coll} = ( %$coll, %$attrs );
+        #        %res = %$attrs;
     }
     else {
         foreach my $value (@$attrs) {
@@ -76,7 +89,7 @@ sub _create {
 
 sub _fetch {
     my $self = shift;
-    my @ids  =  @_;
+    my @ids  = @_;
     my $coll = $self->_mem_cache;
     my %res;
     for (@ids) {
@@ -98,7 +111,7 @@ sub _fetch_all {
 }
 
 sub _store {
-    my $self  = shift;
+    my $self = shift;
 }
 
 sub commit {
