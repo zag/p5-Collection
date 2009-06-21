@@ -140,8 +140,8 @@ sub _store {
         }
         else {
 
-            #is this possible ?
-            warn "resync source collections";
+            #warn "resync source collections";
+            #syncing stable
             $tocreate{$key} = $val;
         }
     }
