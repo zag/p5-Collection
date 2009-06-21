@@ -57,12 +57,12 @@ sub _fetch {
     my $self = shift;
 
     #collect ids to fetch
-    my @ids =  @_;
+    my @ids = @_;
     return {} unless @ids;    #skip empty ids list
     my ( $c1, $c2 ) = @{ $self->_stack };
 
     #read keys from first collection
-    my $res1     = $c1->fetch(@_);
+    my $res1     = $c1->fetch(@ids);
     my @notfound = ();
     foreach my $key (@ids) {
         push @notfound, $key unless exists $res1->{$key};
@@ -120,7 +120,6 @@ sub _store {
     my $hash2store = shift;
     my @ids2store  = keys %$hash2store;
     my $coll2res   = $c2->fetch(@ids2store);
-
     #and create new in col2
     #create non exists keys on c2
     my %tocreate = ();
@@ -129,14 +128,20 @@ sub _store {
             my $value = $coll2res->{$key};
 
             #mirror only HASHes
-            if ( ref($value) eq 'HASH' ) {
+            if ( ref($val) eq 'HASH' ) {
 
                 #use value as hash
                 %$value = %$val;
             }
+            elsif ( UNIVERSAL::isa( $val, 'Collection::Utl::Item' ) ) {
+                %$value = %{$val->attr}
+
+            }
         }
         else {
+
             #is this possible ?
+            warn "resync source collections";
             $tocreate{$key} = $val;
         }
     }
@@ -150,6 +155,7 @@ sub _store {
         next unless exists $coll2res->{$key};
 
     }
+
     # changed items we also mirror to coll2
     $c1->store(@ids2store);
     $c2->store(@ids2store);
@@ -175,10 +181,11 @@ sub _delete {
     my ( $c1, $c2 ) = @{ $self->_stack };
     my %res = ();
     for ( $c1, $c2 ) {
+
         #save results
-        @res { @{ $_->delete(@_) || [] } } =();
+        @res{ @{ $_->delete(@_) || [] } } = ();
     }
-    [keys %res]
+    [ keys %res ];
 }
 1;
 __END__
@@ -194,7 +201,7 @@ Zahatski Aliaksandr, <zag@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2008 by Zahatski Aliaksandr
+Copyright (C) 2005-2009 by Zahatski Aliaksandr
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
