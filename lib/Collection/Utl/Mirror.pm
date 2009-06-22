@@ -86,7 +86,7 @@ sub _fetch {
             #            diag "create". Dumper (\%create_keys);
             #store only simply results
             #now store to coll1
-            my $created = $c1->create( \%create_keys );
+            my $created = $c1->create( %create_keys );
             while ( my ( $k2, $v2 ) = each %$created ) {
                 $res1->{$k2} = $v2;
             }
