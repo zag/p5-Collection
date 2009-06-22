@@ -74,10 +74,11 @@ sub _fetch {
         #        diag "Fetch non exists in col1".Dumper (\@notfound);
         my $res2        = $c2->fetch(@notfound);
         my %create_keys = ();
-        foreach my $k1 (@notfound) {
-            next unless exists $res2->{$k1};    #skip real nonexists keys
-            my $value = $res2->{$k1};
+        while ( my( $k1, $value ) = each  %$res2 )  {
 
+            #save results from $c2 storage in
+            #out put results
+            $res1->{$k1} = $value;
             #save for create
             $create_keys{$k1} = $value;
         }
@@ -87,9 +88,6 @@ sub _fetch {
             #store only simply results
             #now store to coll1
             my $created = $c1->create( %create_keys );
-            while ( my ( $k2, $v2 ) = each %$created ) {
-                $res1->{$k2} = $v2;
-            }
         }
     }
 
