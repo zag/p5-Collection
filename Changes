@@ -1,6 +1,8 @@
 Revision history for Perl extension Collection.
 
 0.45
+    - fix Memcached create()
+    - improve Mirror
     - fix fetch() in Utl::Mirror
     - fix delete() in Memcached
     - handle objects in mirror
