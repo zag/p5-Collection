@@ -83,10 +83,11 @@ sub _create {
     my $memd    = $self->_mem_cache;
     my $ns      = $self->_ns;
     $ns = '' unless defined $ns;
+    my %res = ();
     while ( my ( $key, $val ) = each %to_save ) {
-        $memd->set( $ns . $key, $val );
+        $memd->set( $ns . $key, $val ) && $res{$key}++;
     }
-    return \%to_save;
+    return \%res;
 }
 
 sub _fetch {
