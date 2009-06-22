@@ -74,7 +74,7 @@ sub _delete {
     $memd->delete($_) for @ids;
 
     #return array of deleted
-    [@ids];
+    [@_];
 }
 
 sub _create {
