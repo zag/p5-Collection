@@ -29,7 +29,7 @@ use Test::More;
 require Tie::Hash;
 use Collection;
 @Collection::Utl::Mirror::ISA     = qw(Collection);
-$Collection::Utl::Mirror::VERSION = '0.01';
+$Collection::Utl::Mirror::VERSION = '0.02';
 
 __PACKAGE__->attributes qw( _c1 _c2 _stack);
 

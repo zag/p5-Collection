@@ -1,4 +1,10 @@
 Revision history for Perl extension Collection.
+
+0.45
+    - fix fetch() in Utl::Mirror
+    - fix delete() in Memcached
+    - handle objects in mirror
+    - fix return results for delete ( Utl::Mirror, Memcached, Mem)
 0.44
     - support bind_values in execute (SQL collection)
 0.43
