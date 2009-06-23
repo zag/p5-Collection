@@ -74,8 +74,6 @@ sub _create {
             $res{$key} = $coll->{$key};
         }
 
-        #        %{$coll} = ( %$coll, %$attrs );
-        #        %res = %$attrs;
     }
     else {
         foreach my $value (@$attrs) {

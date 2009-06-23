@@ -88,6 +88,13 @@ sub _fetch {
             #store only simply results
             #now store to coll1
             my $created = $c1->create( %create_keys );
+            #if suss create use records from fast source
+            while ( my ( $key, $val) = each %create_keys ) {
+                #if fail create record in fast src
+                #use record from stable
+                next unless exists $created->{$key};
+                $res1->{$key} = $created->{$key};
+            }
         }
     }
 
@@ -151,7 +158,7 @@ sub _store {
     #mirror coll1 to coll2
     while ( my ( $key, $val ) = each %$hash2store ) {
         next unless exists $coll2res->{$key};
-
+        
     }
 
     # changed items we also mirror to coll2
