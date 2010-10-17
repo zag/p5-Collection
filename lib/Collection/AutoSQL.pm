@@ -103,7 +103,7 @@ use Collection;
 use Collection::Utl::Base;
 use Collection::Utl::ActiveRecord;
 @Collection::AutoSQL::ISA     = qw(Collection);
-$Collection::AutoSQL::VERSION = '0.04';
+$Collection::AutoSQL::VERSION = '1.0';
 attributes
   qw( _dbh _table_name _key_field _is_delete_key_field _sub_ref _fields);
 
@@ -374,7 +374,7 @@ sub _create {
       . ") VALUES ("
       . join( ",",
         map { $self->_dbh()->quote( defined($_) ? $_ : '' ) }
-          map { $arg{$_} } @keys )
+        map { $arg{$_} } @keys )
       . ")";
     $self->_query_dbh($str);
     my $inserted_id;
@@ -409,9 +409,94 @@ sub _fetch_ids {
     return $dbh->selectcol_arrayref($query);
 }
 
+
+#__flow_sql__ $sql_query,[values for sql_query], $on_page_count, $page_num
+sub __flow_sql__ {
+    my $self     = shift;
+    my $flow     = shift;
+    my $query    = shift;
+    my $params   = shift;    #[array]
+    my $bulk     = shift;
+    my $one_page = shift;
+
+    my $dbh   = $self->_dbh();
+    my $field = $self->_key_field;
+    my $page  = $one_page || 0;
+    my $count = 0;
+    my $flow_res;
+    do {
+        my $query_limit = "$query limit " . ( $page * $bulk ) . ", $bulk";
+        my $res = $dbh->selectcol_arrayref($query_limit,{},@$params);
+        $count = scalar(@$res);
+        $flow_res =
+          $flow->flow( map { $self->after_load( { $field => $_ } )->{$field} }
+              @$res );
+        $page++;
+
+    } until $count < $bulk or defined($one_page) or $flow_res;
+    return undef;
+
+}
+=head2 list_ids [ flow=>$Flow],
+
+Return list of ids
+
+
+params:
+
+ flow - Flow:: object for streaming results
+ onpage - [pagination] count of ids on page
+ page - [pagination] requested page ( depend on onpage)
+ exp - ref to expression for select
+
+return:
+    [array] - array of ids
+
+if used C<flow> param:
+    "string" - if error
+    undef  - ok
+
+expamles:
+
+    $c->list_ids() #return [array of ids]
+
+    $c->list_ids(flow=>$flow, exp=>{ type=>"t1", "date<"=>12341241 },
+        page=>2, onpage=>10  )
+
+=cut
+
 sub list_ids {
     my $self = shift;
-    return $self->_fetch_ids;
+    my %args = @_;
+
+    # return array ref by default
+    return $self->_fetch_ids unless scalar(@_);
+    my @query_param = ();
+    my $where;
+
+    if ( my $exp = $args{'expr'} ) {
+        ( $where, @query_param ) = $self->_prepare_where($exp);
+    }
+    
+    #make query
+    my $dbh        = $self->_dbh();
+    my $table_name = $self->_table_name();
+    my $field      = $self->_key_field;
+    my $query      = "SELECT $field FROM $table_name";
+    $query .= " where $where" if $where;
+    my $onpage        = $args{onpage} || 10000;
+    #add order by 
+    if (my $orderby = $args{order} ) {
+        $query .=" ORDER BY $orderby"; 
+    }
+
+    if ( my $flow = $args{flow} ) {
+        my $fparser = $flow->parser;
+        $fparser->begin;
+        $self->__flow_sql__( $fparser, $query, \@query_param, $onpage,
+            $args{page} );
+        $fparser->end;
+    }
 }
 
 sub _prepare_record {
@@ -455,7 +540,7 @@ Zahatski Aliaksandr, <zag@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2008 by Zahatski Aliaksandr
+Copyright (C) 2005-2010 by Zahatski Aliaksandr
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

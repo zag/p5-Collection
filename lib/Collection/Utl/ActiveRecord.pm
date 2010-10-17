@@ -83,13 +83,13 @@ sub TIEHASH {return Collection::Utl::Base::new(@_) }
 
 sub FIRSTKEY {
     my ($self) = @_;
-    $self->__temp_array( [ sort { $a cmp $b } @{ $self->GetKeys() } ] );
-    shift( @{ $self->__temp_array() } );
+    $self->{__temp_array} =  [ sort { $a cmp $b } @{ $self->GetKeys() } ] ;
+    shift( @{ $self->{__temp_array} } );
 }
 
 sub NEXTKEY {
     my ( $self, $key ) = @_;
-    shift( @{ $self->__temp_array() } );
+    shift( @{ $self->{__temp_array} } );
 }
 
 sub EXISTS {

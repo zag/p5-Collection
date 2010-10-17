@@ -1,5 +1,8 @@
 Revision history for Perl extension Collection.
 
+0.46 17 Oct 2010
+    -add Flow support for AutoSQL
+
 0.45
     - fix Memcached create()
     - improve Mirror
