@@ -103,7 +103,7 @@ use Collection;
 use Collection::Utl::Base;
 use Collection::Utl::ActiveRecord;
 @Collection::AutoSQL::ISA     = qw(Collection);
-$Collection::AutoSQL::VERSION = '1.0';
+$Collection::AutoSQL::VERSION = '1.1';
 attributes
   qw( _dbh _table_name _key_field _is_delete_key_field _sub_ref _fields);
 
@@ -448,6 +448,7 @@ params:
  onpage - [pagination] count of ids on page
  page - [pagination] requested page ( depend on onpage)
  exp - ref to expression for select
+ desc - revert sorting ([1,0])
 
 return:
     [array] - array of ids
@@ -461,7 +462,7 @@ expamles:
     $c->list_ids() #return [array of ids]
 
     $c->list_ids(flow=>$flow, exp=>{ type=>"t1", "date<"=>12341241 },
-        page=>2, onpage=>10  )
+        page=>2, onpage=>10, desc=>1  )
 
 =cut
 
@@ -489,6 +490,8 @@ sub list_ids {
     if (my $orderby = $args{order} ) {
         $query .=" ORDER BY $orderby"; 
     }
+    #change sorting
+    $query .=" DESC" if $args{desc} ; 
 
     if ( my $flow = $args{flow} ) {
         my $fparser = $flow->parser;
