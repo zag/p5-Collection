@@ -102,6 +102,7 @@ use Carp;
 use Collection;
 use Collection::Utl::Base;
 use Collection::Utl::ActiveRecord;
+use Collection::Utl::Flow;
 @Collection::AutoSQL::ISA     = qw(Collection);
 $Collection::AutoSQL::VERSION = '1.1';
 attributes
@@ -409,7 +410,6 @@ sub _fetch_ids {
     return $dbh->selectcol_arrayref($query);
 }
 
-
 #__flow_sql__ $sql_query,[values for sql_query], $on_page_count, $page_num
 sub __flow_sql__ {
     my $self     = shift;
@@ -426,7 +426,7 @@ sub __flow_sql__ {
     my $flow_res;
     do {
         my $query_limit = "$query limit " . ( $page * $bulk ) . ", $bulk";
-        my $res = $dbh->selectcol_arrayref($query_limit,{},@$params);
+        my $res = $dbh->selectcol_arrayref( $query_limit, {}, @$params );
         $count = scalar(@$res);
         $flow_res =
           $flow->flow( map { $self->after_load( { $field => $_ } )->{$field} }
@@ -437,6 +437,7 @@ sub __flow_sql__ {
     return undef;
 
 }
+
 =head2 list_ids [ flow=>$Flow],
 
 Return list of ids
@@ -449,6 +450,8 @@ params:
  page - [pagination] requested page ( depend on onpage)
  exp - ref to expression for select
  desc - revert sorting ([1,0])
+ where -  custom where if needed, instead expr ['where sring', $query_param1,..]
+ query - custom query
 
 return:
     [array] - array of ids
@@ -474,24 +477,28 @@ sub list_ids {
     return $self->_fetch_ids unless scalar(@_);
     my @query_param = ();
     my $where;
-
-    if ( my $exp = $args{'expr'} ) {
+    if ( my $custom_where = $args{'where'} ) {
+        ( $where, @query_param ) = @{$custom_where};
+    }
+    elsif ( my $exp = $args{'expr'} ) {
         ( $where, @query_param ) = $self->_prepare_where($exp);
     }
-    
+
     #make query
     my $dbh        = $self->_dbh();
     my $table_name = $self->_table_name();
     my $field      = $self->_key_field;
-    my $query      = "SELECT $field FROM $table_name";
+    my $query      = $args{query} || "SELECT $field FROM $table_name";
     $query .= " where $where" if $where;
-    my $onpage        = $args{onpage} || 10000;
-    #add order by 
-    if (my $orderby = $args{order} ) {
-        $query .=" ORDER BY $orderby"; 
+    my $onpage = $args{onpage} || 10000;
+
+    #add order by
+    if ( my $orderby = $args{order} ) {
+        $query .= " ORDER BY $orderby";
     }
+
     #change sorting
-    $query .=" DESC" if $args{desc} ; 
+    $query .= " DESC" if $args{desc};
 
     if ( my $flow = $args{flow} ) {
         my $fparser = $flow->parser;
@@ -499,6 +506,12 @@ sub list_ids {
         $self->__flow_sql__( $fparser, $query, \@query_param, $onpage,
             $args{page} );
         $fparser->end;
+    } else {
+        #return flow
+        new Collection::Utl::Flow:: __flow_sql__=>[
+            $query, \@query_param, $onpage,
+            $args{page}],
+            __collection__ => $self
     }
 }
 
@@ -543,7 +556,7 @@ Zahatski Aliaksandr, <zag@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2010 by Zahatski Aliaksandr
+Copyright (C) 2005-2011 by Zahatski Aliaksandr
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

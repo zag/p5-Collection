@@ -1,5 +1,9 @@
 Revision history for Perl extension Collection.
 
+0.48 9 May 2011
+    - flow sql queryes
+    - support for premastered SQL queries (AutoSQL::list_ids)
+
 0.47 9 Nov 2010
     -add desc param to  AutoSQL::list_ids
 
