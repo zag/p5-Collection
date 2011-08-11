@@ -120,10 +120,11 @@ sub _store {
     my @fields;
     while ( my ( $key, $rec_ref ) = each %$ref ) {
         my $tmp_val = ref($rec_ref) eq 'HASH' ? $rec_ref : $rec_ref->_get_attr;
+        #add key for save
+        $tmp_val->{$field} = $key;
         my $prepared = $self->before_save($tmp_val);
         my @rows = ref($prepared) eq 'ARRAY' ? @$prepared : ($prepared);
         foreach my $val ( @rows ) {
-        $val->{$field} = $key;
         unless ( @fields ) { 
             @fields = keys %$val;
             };
@@ -134,6 +135,12 @@ sub _store {
    }
 }
 
+sub list_ids {
+    my $self = shift;
+    # return array ref by default
+    return $self->_fetch_ids unless scalar(@_);
+    return $self->SUPER::list_ids(@_, uniq=>1);
+}
 1;
 
 __END__

@@ -452,6 +452,7 @@ params:
  desc - revert sorting ([1,0])
  where -  custom where if needed, instead expr ['where sring', $query_param1,..]
  query - custom query
+ uniq - set uniq flag ( eq GROUP BY (key) )
 
 return:
     [array] - array of ids
@@ -490,6 +491,10 @@ sub list_ids {
     my $field      = $self->_key_field;
     my $query      = $args{query} || "SELECT $field FROM $table_name";
     $query .= " where $where" if $where;
+    if ($args{uniq}) {
+      #strip dups
+      $query .= " group by $field";
+    }
     my $onpage = $args{onpage} || 10000;
 
     #add order by
