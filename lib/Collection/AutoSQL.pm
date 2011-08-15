@@ -418,7 +418,6 @@ sub __flow_sql__ {
     my $params   = shift;    #[array]
     my $bulk     = shift;
     my $one_page = shift;
-
     my $dbh   = $self->_dbh();
     my $field = $self->_key_field;
     my $page  = $one_page || 0;
@@ -429,7 +428,7 @@ sub __flow_sql__ {
         my $res = $dbh->selectcol_arrayref( $query_limit, {}, @$params );
         $count = scalar(@$res);
         $flow_res =
-          $flow->flow( map { $self->after_load( { $field => $_ } )->{$field} }
+          $flow->_flow( map { $self->after_load( { $field => $_ } )->{$field} }
               @$res );
         $page++;
 
