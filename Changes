@@ -1,8 +1,9 @@
 Revision history for Perl extension Collection.
 
-0.49 11 Aug 2011
+0.49 14 Aug 2011
     - apply types for keys (Collection::AutoSQLnotUnique)
     - allow strip dublicates for key (uniq flag for list_ids)
+    - use _flow method for stream sql results (AutoSQL)
 
 0.48 9 May 2011
     - flow sql queryes
