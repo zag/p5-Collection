@@ -4,7 +4,7 @@ package Collection;
 
 =head1 NAME
 
-Collection - Collections framework for  B<CRUD> of the data or objects.
+Collection - CRUD framework
 
 =head1 SYNOPSIS
 
@@ -85,7 +85,7 @@ use Collection::Utl::ActiveRecord;
 use Collection::Utl::Base;
 use Collection::Utl::LazyObject;
 @Collection::ISA     = qw(Collection::Utl::Base);
-$Collection::VERSION = '0.49';
+$Collection::VERSION = '0.50';
 attributes qw( _obj_cache );
 
 sub _init {

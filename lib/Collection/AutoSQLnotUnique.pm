@@ -114,10 +114,7 @@ sub _store {
     my $table_name = $self->_table_name();
     my $field      = $self->_key_field;
     my @id2del = keys %$ref;
-    #$self->_query_dbh("DELETE FROM $table_name where $field in (".(join ','=>@id2del).")", @id2del );
-    $self->SUPER::_delete(@id2del);
-    my $sth;
-    my @fields;
+    $self->_delete(@id2del);
     while ( my ( $key, $rec_ref ) = each %$ref ) {
         my $tmp_val = ref($rec_ref) eq 'HASH' ? $rec_ref : $rec_ref->_get_attr;
         #add key for save
@@ -125,11 +122,9 @@ sub _store {
         my $prepared = $self->before_save($tmp_val);
         my @rows = ref($prepared) eq 'ARRAY' ? @$prepared : ($prepared);
         foreach my $val ( @rows ) {
-        unless ( @fields ) { 
-            @fields = keys %$val;
-            };
+        my @fields = keys %$val;
         my $exex_opt = join ",",  map { '?' } (@fields);
-        $sth = $dbh->prepare("INSERT INTO $table_name ( ".join(',',@fields).") VALUES ( $exex_opt )") unless $sth;
+        my $sth = $dbh->prepare("INSERT INTO $table_name ( ".join(',',@fields).") VALUES ( $exex_opt )");
         $sth->execute(@$val{ @fields });
         }
    }

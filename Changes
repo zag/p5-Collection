@@ -1,5 +1,9 @@
 Revision history for Perl extension Collection.
 
+0.50 28 Aug 2011
+    - AutoSQLnotUnique: delete caching (differrent keys in recs for save)
+    - AutoSQLnotUnique: fix invoke class method _delete
+
 0.49 14 Aug 2011
     - apply types for keys (Collection::AutoSQLnotUnique)
     - allow strip dublicates for key (uniq flag for list_ids)
