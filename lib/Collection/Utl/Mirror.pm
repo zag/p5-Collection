@@ -31,7 +31,7 @@ use Collection;
 @Collection::Utl::Mirror::ISA     = qw(Collection);
 $Collection::Utl::Mirror::VERSION = '0.02';
 
-__PACKAGE__->attributes qw( _c1 _c2 _stack);
+__PACKAGE__->attributes (qw( _c1 _c2 _stack));
 
 sub Init {
     my ( $self, $c1, $c2 ) = @_;
