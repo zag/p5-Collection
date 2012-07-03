@@ -1,5 +1,8 @@
 Revision history for Perl extension Collection.
 
+0.52 03 Jul 2012
+    - add PostgreSQL fix ( Collection::AutoSQL::__flow_sql__)
+    
 0.51 19 Jun 2012
     - add experimental Collection::CrcColl
 

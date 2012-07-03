@@ -71,7 +71,7 @@ sub _deprecated {
 
 sub new {
     my $class = shift;
-    my $self  = {};
+    my $self  = {@_};
     my $stat;
     bless( $self, $class );
     return ( $stat = $self->_init(@_) ) ? $self : $stat;

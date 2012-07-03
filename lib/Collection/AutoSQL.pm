@@ -16,7 +16,9 @@ package Collection::AutoSQL;
            sub_ref =>
               #callback for create objects for readed records
               sub { my $id = shift; new MyObject:: shift }
-             
+ 
+             dbtype => 'pg' # set type of DataBase to PostgreSQL (default: mysql)
+
 =head1 DESCRIPTION
 
 Provide simply access to records, with unique field.
@@ -424,7 +426,10 @@ sub __flow_sql__ {
     my $count = 0;
     my $flow_res;
     do {
-        my $query_limit = "$query limit " . ( $page * $bulk ) . ", $bulk";
+        my $query_limit = 
+                    ( ($self->{dbtype}|| '' ) eq  'pg') 
+                    ? "$query limit $bulk offset " . ( $page * $bulk )
+                    : "$query limit " . ( $page * $bulk ) . ", $bulk";
         my $res = $dbh->selectcol_arrayref( $query_limit, {}, @$params );
         $count = scalar(@$res);
         $flow_res =
