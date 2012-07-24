@@ -334,7 +334,7 @@ sub _prepare_where {
             }
             push @sql_and, "$field $sql_term $values_sql";
         }
-        push @sql_or, "(" . join( " and ", @sql_and ) . ")";
+        push @sql_or, "(" . join( " and ", @sql_and ) . ")" if @sql_and;
     }
     return join " or ", @sql_or;
 }
