@@ -86,13 +86,15 @@ use Collection::Utl::Base;
 use Collection::Utl::LazyObject;
 @Collection::ISA     = qw(Collection::Utl::Base);
 $Collection::VERSION = '0.53';
-attributes qw( _obj_cache  _on_store);
+attributes qw( _obj_cache  _on_store _on_create _on_delete);
 
 sub _init {
     my $self = shift;
     my %arg  = @_;
     $self->_obj_cache( {} );
     $self->_on_store( $arg{on_store} );
+    $self->_on_create( $arg{on_create} );
+    $self->_on_delete( $arg{on_delete} );
     $self->SUPER::_init(@_);
 }
 
@@ -191,7 +193,13 @@ sub create {
     my $self     = shift;
     my $coll_ref = $self->_obj_cache();
     my $results  = $self->_create(@_);
-    return $self->fetch( keys %$results );
+    my $created = $self->fetch( keys %$results );
+    if (%$created) {
+      if ( ref( $self->_on_create ) eq 'CODE' ) {
+        $self->_on_create()->(%$created);
+      }
+    }
+    return $created
 }
 
 =head2 fetch_one(ID1), get_one(ID1)
@@ -350,6 +358,9 @@ sub delete {
     my $self = shift;
     my (@ids) =  @_;
     $self->release(@ids);
+    if ( ref( $self->_on_delete ) eq 'CODE' ) {
+        $self->_on_delete()->(@ids);
+    }
     $self->_delete(@ids);
 }
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Collection.
 
+
+    - add on_store handler
+    - add json serialization for fields
+     
 0.53 24 Jul 2012
     - fix empty 'where'
 0.52 03 Jul 2012
