@@ -1,7 +1,7 @@
 Revision history for Perl extension Collection.
 
 
-    - add on_store handler
+    - add on_store,on_delete, on_create handlers (Collection)
     - add json serialization for fields
      
 0.53 24 Jul 2012
