@@ -14,6 +14,7 @@ package Collection::CrcColl;
 use strict;
 use warnings;
 use String::CRC32;
+use JSON::XS;
 use Collection::AutoSQL;
 our @ISA = qw(Collection::AutoSQL);
 
@@ -167,7 +168,14 @@ sub after_load {
         # unpack string 'test_val=1,mod=0'
             $val ={ map { split/=/,$_ } split /,/, $val }; 
         }
-        $res{$key} = $val;
+         if ($type eq 'json' ) {
+            unless ($val) {
+                $val = {}
+            } else {
+                $val = decode_json($val)
+            }
+        }
+       $res{$key} = $val;
     
     }
     return \%res;
@@ -200,6 +208,10 @@ sub before_save {
             $val={} unless ref($val);
             #serialize
             $val = join ","=> map {"$_=".$val->{$_}} keys %$val;
+        }
+        if ($fields->{$key} eq 'json' ) {
+            $val={} unless ref($val);
+            $val = encode_json($val);
         }
         $res{$key} = $val;
     }

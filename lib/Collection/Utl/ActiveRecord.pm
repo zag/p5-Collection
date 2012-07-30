@@ -31,7 +31,7 @@ use Collection::Utl::Base;
 @Collection::Utl::ActiveRecord::ISA = qw(Tie::StdHash Collection::Utl::Base);
 $Collection::Utl::ActiveRecord::VERSION = '0.01';
 
-attributes qw( _changed _orig_record __temp_array);
+attributes qw( _changed_ _orig_record __temp_array);
 
 sub _init {
     my $self = shift;
@@ -40,7 +40,7 @@ sub _init {
 
 sub DELETE {
     my ( $self, $key ) = @_;
-    $self->_changed(1);
+    $self->_changed_(1);
     delete $self->_orig_record->{$key};
 
 }
@@ -48,14 +48,15 @@ sub DELETE {
 sub STORE {
     my ( $self, $key, $val ) = @_;
     my $hash = $self->_orig_record;
-    $self->_changed(1);
+    $self->_changed_(1);
     $hash->{$key} = $val;
 }
 
+sub _changed { $_[0]->_changed_}
 sub FETCH {
     my ( $self, $key ) = @_;
     if ( $key eq '_changed' ) {
-        $self->_changed();
+        $self->_changed_();
     }
     else {
         $self->_orig_record->{$key};
@@ -68,7 +69,7 @@ sub Init {
     unless ( $arg{hash} ) {
         carp "Not inited param hash"
     }
-    $self->_changed(0);
+    $self->_changed_(0);
     return 1;
 }
 
@@ -101,7 +102,7 @@ sub EXISTS {
 sub CLEAR {
     my $self = shift;
     %{ $self->_orig_record } = ();
-    $self->_changed(1);
+    $self->_changed_(1);
 }
 
 1;

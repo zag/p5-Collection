@@ -86,11 +86,13 @@ use Collection::Utl::Base;
 use Collection::Utl::LazyObject;
 @Collection::ISA     = qw(Collection::Utl::Base);
 $Collection::VERSION = '0.53';
-attributes qw( _obj_cache );
+attributes qw( _obj_cache  _on_store);
 
 sub _init {
     my $self = shift;
+    my %arg  = @_;
     $self->_obj_cache( {} );
+    $self->_on_store( $arg{on_store} );
     $self->SUPER::_init(@_);
 }
 
@@ -323,12 +325,15 @@ sub store {
     foreach my $id (@store_ids) {
         my $ref = $coll_ref->{$id};
         next unless ref($ref);
-        if ( ( ref($ref) eq 'HASH' ) ? $ref->{_changed} : $ref->_changed() ) {
-            $to_store{$id} = $ref;
+        if ( $self->is_record_changed($ref) ) {
+           $to_store{$id} = $ref;
         }
     }
     if (%to_store) {
-        $self->_store( \%to_store );
+      if ( ref( $self->_on_store ) eq 'CODE' ) {
+        $self->_on_store()->(%to_store );
+      }
+      $self->_store( \%to_store );
     }
 }
 
@@ -360,22 +365,35 @@ sub get_lazy {
     return new Collection::Utl::LazyObject:: sub { $self->fetch_one($id) };
 }
 
+sub is_record_changed {
+    my $self = shift;
+    my $record = shift || return;
+    if ( ref($record) eq 'HASH' ) {
+        return $record->{_changed};
+=pod
+        if ( my $obj = tied $value ) {
+            push @changed, $id if $obj->_changed();
+        }
+        else {
+            push @changed, $id if $value->{_changed};
+        }
+=cut
+
+    }
+    else {
+        return $record->_changed() if UNIVERSAL::can($record, '_changed');
+        return $self->is_record_changed( $record->_get_attr ) if UNIVERSAL::can($record, '_get_attr');
+        carp "Can't check is record changed for class: " . ref($record);
+    }
+
+}
+
 sub get_changed_id {
     my $self     = shift;
     my $coll_ref = $self->_obj_cache();
     my @changed  = ();
     while ( my ( $id, $value ) = each %$coll_ref ) {
-        if ( ref($value) eq 'HASH' ) {
-            if ( my $obj = tied $value ) {
-                push @changed, $id if $obj->_changed();
-            }
-            else {
-                push @changed, $id if $value->{_changed};
-            }
-        }
-        else {
-            push @changed, $id if $value->_changed();
-        }
+            push @changed, $id if $self->is_record_changed($value)
     }
     return \@changed;
 }

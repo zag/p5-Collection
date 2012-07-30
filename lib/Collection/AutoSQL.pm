@@ -171,6 +171,7 @@ sub _store {
     my ( $self, $ref ) = @_;
     my $table_name = $self->_table_name();
     my $field      = $self->_key_field;
+
     while ( my ( $key, $rec_ref ) = each %$ref ) {
         my $tmp_val  = ref($rec_ref) eq 'HASH' ? $rec_ref : $rec_ref->_get_attr;
         my $prepared = $self->before_save($tmp_val);
