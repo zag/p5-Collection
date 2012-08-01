@@ -1,6 +1,8 @@
 Revision history for Perl extension Collection.
 
 
+0.54 01 Aug 2012
+    - add Collection::Index for storing indexes in separate MySQL tables 
     - add on_store,on_delete, on_create handlers (Collection)
     - add json serialization for fields
      
