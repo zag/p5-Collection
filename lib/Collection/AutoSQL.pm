@@ -462,6 +462,7 @@ params:
  where -  custom where if needed, instead expr ['where sring', $query_param1,..]
  query - custom query
  uniq - set uniq flag ( eq GROUP BY (key) )
+ order - ORDER BY field
 
 return:
     [array] - array of ids
