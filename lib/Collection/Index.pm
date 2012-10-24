@@ -82,10 +82,40 @@ sub before_save {
 
 }
 
+sub fetch {
+    my $self     = shift;
+    my @ids      = ();
+    my $coll_ref = $self->_obj_cache();
+    my @fetch    = ();
+    foreach my $id (@_) {
+        next
+          unless defined $id;
+
+        push @fetch, $id;
+    }
+    my %result = ();
+    if ( scalar(@fetch)
+        && ( my $results = $self->_fetch(@fetch) ) )
+    {
+        while ( my ( $key, $val ) = each %{$results} ) {
+            #bless for loaded
+            my $ref = $self->_prepare_record( $key, $results->{$key} );
+            if ( ref($ref) ) {
+                $result{$key} = $ref;
+            } else {
+                warn "Fail prepare for $key";
+            }
+        }
+    }
+    return \%result;
+}
 
 #no any ActiveRecord
 sub _prepare_record {
     my ( $self, $key, $ref ) = @_;
+    if ( ref( $self->_sub_ref ) eq 'CODE' ) {
+        return $self->_sub_ref()->( $key, $ref );
+    }
      return $ref;
 }
 
@@ -93,7 +123,9 @@ sub _store {
     my $self = shift;
     return $self->Collection::AutoSQLnotUnique::_store(@_)
 }
-
+sub store {
+    die "not implemented";
+}
 sub list_ids {
     my $self = shift;
     return $self->Collection::AutoSQLnotUnique::list_ids(@_)
