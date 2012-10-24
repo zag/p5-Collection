@@ -1,5 +1,6 @@
 Revision history for Perl extension Collection.
 
+    - delete caching for Index
 0.55 09 Oct 2012
     - add file storage
 0.54 01 Aug 2012
