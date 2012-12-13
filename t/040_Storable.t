@@ -59,5 +59,5 @@ is_deeply $t3_,
   },
   'check store';
 
-is_deeply $coll->list_ids, [ '1', '3' ], 'check list_ids';
+is_deeply [ sort @{ $coll->list_ids }], [ '1', '3' ], 'check list_ids';
 

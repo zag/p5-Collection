@@ -18,7 +18,7 @@ use JSON::XS;
 use Collection::AutoSQL;
 our @ISA = qw(Collection::AutoSQL);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 sub raw2hex { lc unpack( "H*", shift ) }
 sub hex2raw { pack( "H*", shift ) }
 
@@ -172,6 +172,8 @@ sub after_load {
             unless ($val) {
                 $val = {}
             } else {
+                #clear UTF-X bit
+                utf8::encode($val) if utf8::is_utf8($val);
                 $val = decode_json($val)
             }
         }
