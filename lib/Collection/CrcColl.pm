@@ -213,7 +213,7 @@ sub before_save {
         }
         if ($fields->{$key} eq 'json' ) {
             $val={} unless ref($val);
-            $val = encode_json($val);
+            $val = JSON::XS->new->utf8->pretty->encode($val);
         }
         $res{$key} = $val;
     }
@@ -289,6 +289,23 @@ sub _store {
             $self->_query_dbh( $query, map ( $_->[1], @records ), @values );
         }    #foreach
     }    #while
+}
+
+
+sub _fetch_ids {
+    my $self       = shift;
+    my $dbh        = $self->_dbh();
+    my $table_name = $self->_table_name();
+    my $field      = $self->_key_field;
+    my $query      = "SELECT $field FROM $table_name";
+    my $ref = $dbh->selectcol_arrayref($query);
+    my $fields   = $self->_fields;
+    if ( my $type = $self->_fields->{$field}) {
+        if ($type eq 'binary') {
+           return [ map { raw2hex($_)} @$ref ] 
+        }
+    }
+    return $ref;
 }
 
 1;
