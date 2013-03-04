@@ -214,7 +214,7 @@ sub before_save {
         }
         if ($fields->{$key} eq 'json' ) {
             $val={} unless ref($val);
-            $val = encode_json($val);
+            $val = JSON::XS->new->utf8->pretty->encode($val);
         }
         $res{$key} = $val;
     }
@@ -292,7 +292,6 @@ sub _store {
     }    #while
 }
 
-# handle binary id 
 sub _fetch_ids {
     my $self       = shift;
     my $dbh        = $self->_dbh();

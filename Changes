@@ -1,5 +1,9 @@
 Revision history for Perl extension Collection.
 
+0.57 03 Mar 2013
+    - pretty JSON (::CrcCall)
+    - handle bunary for fetch_ids (::CrcCall)
+
 0.56 13 Dec 2012
     - fix dencode json for utf8
     - fix tests
