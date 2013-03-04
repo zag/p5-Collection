@@ -28,6 +28,7 @@ sub hex2raw { pack( "H*", shift ) }
 varchar => string       strin
 binary => hex2raw ( raw2hex)        BINARY
 refhash => { var1=>'1', var2=>0}    string ('var1=0 , var=2')
+json   => string    json serialized
 
 =cut
 sub _create {
@@ -289,6 +290,23 @@ sub _store {
             $self->_query_dbh( $query, map ( $_->[1], @records ), @values );
         }    #foreach
     }    #while
+}
+
+# handle binary id 
+sub _fetch_ids {
+    my $self       = shift;
+    my $dbh        = $self->_dbh();
+    my $table_name = $self->_table_name();
+    my $field      = $self->_key_field;
+    my $query      = "SELECT $field FROM $table_name";
+    my $res = $dbh->selectcol_arrayref($query);
+    if ( my $type = $self->_fields->{$field} ) {
+        #convert binary to string
+        if ($type eq 'binary') {
+            $_ = raw2hex($_) for @$res ;
+        }
+    }
+    return $res;
 }
 
 1;
