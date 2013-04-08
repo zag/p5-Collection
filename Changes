@@ -1,4 +1,6 @@
 Revision history for Perl extension Collection.
+0.58 08 Apr 2013
+    - fix crc32(undef) ( ::CrcColl)
 
 0.57 03 Mar 2013
     - pretty JSON (::CrcCall)

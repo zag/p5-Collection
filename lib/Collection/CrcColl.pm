@@ -90,7 +90,7 @@ sub _expand_rules {
                 # expand to crc and field_name
                 my $values = $rec->{'values'};
                 my ($crcrec) = $self->SUPER::_expand_rules(
-                    { $crc_field_name => [ map { crc32($_) } @$values ] } );
+                    { $crc_field_name => [ map { defined($_) ? crc32($_) : 0  } @$values ] } );
                 push @group, @$crcrec, $rec;
             }
         }
@@ -205,7 +205,7 @@ sub before_save {
           if exists $fields->{$key} and $fields->{$key} eq 'binary';
         my $crc_field_name = $key . "_crc";
         if ( exists $fields->{$crc_field_name} ) {
-            $crced{$crc_field_name} = $res{$crc_field_name} = crc32($val);
+            $crced{$crc_field_name} = $res{$crc_field_name} = defined($val) ? crc32($val) : 0;
         }
         if ($fields->{$key} eq 'refhash' ) {
             $val={} unless ref($val);

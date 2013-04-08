@@ -10,6 +10,7 @@ use warnings;
 use Collection::CrcColl;
 use Collection::AutoSQLnotUnique;
 use base 'Collection::CrcColl';
+our $VERSION = '0.02';
 #store records immediately
 =head2 
 
